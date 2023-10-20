@@ -1,0 +1,10 @@
+cloud:
+  aws:
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    region:
+      static: ${cloud.aws.region.static}
+    s3:
+      bucket : ${cloud.aws.s3.bucket}
+      goods-bucket : ${cloud.aws.s3.goods-bucket}
