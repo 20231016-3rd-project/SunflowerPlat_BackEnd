@@ -6,6 +6,6 @@ import lombok.*;
 @Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 public class ReviewDto {
 }

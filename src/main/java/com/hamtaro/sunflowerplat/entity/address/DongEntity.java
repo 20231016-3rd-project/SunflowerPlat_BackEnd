@@ -20,16 +20,13 @@ public class DongEntity {
     @Column(name = "dong_id")
     private Long dongId;
 
-    @Column(name = "districts_id")
-    private Long districtsId;
-
     @Column(name = "dong_name")
     private String dongName;
 
     @ManyToOne
-    @JoinColumn(name = "dong_id")
+    @JoinColumn(name = "districts_id")
     private DistrictsEntity districtsEntity;
 
-    @OneToMany(mappedBy = "restaurant_id", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "dongEntity", cascade = CascadeType.ALL)
     private List<RestaurantEntity> restaurantEntityList;
 }

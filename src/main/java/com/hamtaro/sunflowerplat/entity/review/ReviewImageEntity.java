@@ -16,8 +16,8 @@ public class ReviewImageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_id")
-    private Long reviewId;
+    @Column(name = "review_image_id")
+    private Long reviewImageId;
 
     @Column(name = "review_origin_name")
     private String reviewOriginName;

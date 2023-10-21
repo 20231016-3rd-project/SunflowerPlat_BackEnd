@@ -1,5 +1,6 @@
 package com.hamtaro.sunflowerplat.entity.restaurant;
 
+import com.hamtaro.sunflowerplat.entity.address.DongEntity;
 import com.hamtaro.sunflowerplat.entity.review.LikeCountEntity;
 import com.hamtaro.sunflowerplat.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplat.entity.review.ReviewEntity;
@@ -49,12 +50,16 @@ public class RestaurantEntity {
     @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<RestaurantMenuEntity> restaurantMenuEntity = new ArrayList<>();
 
-    @OneToMany(mappedBy = "likeCountEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<LikeCountEntity> likeCountEntityList;
 
-    @OneToMany(mappedBy = "requestEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<RequestEntity> requestEntityList;
 
-    @OneToMany(mappedBy = "reviewEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<ReviewEntity> reviewEntityList;
+
+    @ManyToOne
+    @JoinColumn(name = "dong_id")
+    private DongEntity dongEntity;
 }

@@ -19,9 +19,6 @@ public class DistrictsEntity {
     @Column(name = "districts_id")
     private Long districtsId;
 
-    @Column(name = "city_id")
-    private Long cityId;
-
     @Column(name = "districts_name")
     private String districtsName;
 
@@ -29,6 +26,6 @@ public class DistrictsEntity {
     @JoinColumn(name = "city_id")
     private CityEntity cityEntity;
 
-    @OneToMany(mappedBy = "dong_id" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "districtsEntity" , cascade = CascadeType.ALL)
     private List<DongEntity> dongEntityList;
 }

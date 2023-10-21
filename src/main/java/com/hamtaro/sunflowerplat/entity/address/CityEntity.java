@@ -21,6 +21,6 @@ public class CityEntity {
     @Column(name = "city_name")
     private String cityName;
 
-    @OneToMany(mappedBy = "districts_id", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cityEntity", cascade = CascadeType.ALL)
     private List<DistrictsEntity> districtsEntityList;
 }
