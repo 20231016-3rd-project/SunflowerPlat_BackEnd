@@ -53,7 +53,7 @@ public class ReviewService {
     }
 
     public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto, Long userId){
-        RestaurantEntity restaurantEntity = restaurantRepository.findById(reviewSaveDto.getRestaurantId()).get();
+        RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(reviewSaveDto.getRestaurantId()).get();
         MemberEntity memberEntity = (memberRepository.findById(userId)).get();
         ReviewEntity reviewSaveEntity = ReviewEntity.builder()
                 .reviewContent(reviewSaveDto.getReviewContent())
