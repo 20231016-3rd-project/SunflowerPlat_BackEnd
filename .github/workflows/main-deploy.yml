@@ -3,7 +3,7 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   deploy:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@master
+        uses: actions/checkout@dev
 
       - name: Set up JDK 11
         uses: actions/setup-java@v3
@@ -47,6 +47,11 @@ jobs:
       - name: Make zip file
         run: |
           mkdir deploy
+          cp ./docker-compose.blue.yml ./deploy/
+          cp ./docker-compose.green.yml ./deploy/
+          cp ./appspec.yml ./deploy/
+          cp ./Dockerfile ./deploy/
+          cp ./scripts/*.sh ./deploy/
           cp ./build/libs/*.jar ./deploy/
           zip -r -qq -j ./spring-build.zip ./deploy
 
@@ -62,3 +67,10 @@ jobs:
           aws s3 cp \
             --region ap-northeast-2 \
             ./spring-build.zip s3://sunflowerplate-cicd-bucket
+
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name spring-deploy
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name spring-deploy-group
+          --s3-location bucket=tcat-spring,bundleType=zip,key=spring-build.zip
+
