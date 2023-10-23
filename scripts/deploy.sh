@@ -33,8 +33,7 @@ else
   sudo docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml down
   sudo docker image prune -af
   echo "blue 중단 완료 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> /home/ec2-user/deploy.log
-fi
   echo "배포 종료  : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> /home/ec2-user/deploy.log
-
+fi
   echo "===================== 배포 완료 =====================" >> /home/ec2-user/deploy.log
     echo >> /home/ec2-user/deploy.log
