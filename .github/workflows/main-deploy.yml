@@ -67,8 +67,8 @@ jobs:
             ./spring-build.zip s3://sunflowerplate-cicd-bucket
 
       - name: Code Deploy
-        run: aws deploy create-deployment --application-name spring-deploy
+        run: aws deploy create-deployment --application-name sunflowerplate_cicd
           --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name spring-deploy-group
+          --deployment-group-name sunflowerplate_instance
           --s3-location bucket=tcat-spring,bundleType=zip,key=spring-build.zip
 
