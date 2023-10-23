@@ -73,9 +73,9 @@ jobs:
             ./spring-build.zip s3://sunflowerplate-cicd-bucket
 
       - name: Code Deploy 배포 요청
-        run: aws deploy create-deployment --application-name backend-deploy-group
+        run: aws deploy create-deployment --application-name sunflowerplate_cicd
           --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name backend-deploy-group
+          --deployment-group-name sunflowerplate_instance
           --s3-location bucket=backend-rex-bucket,bundleType=zip,key=spring-build.zip
 
 
