@@ -10,7 +10,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportDto {
-    private Long restaurantId;
 
     private Long reviewId;
 
