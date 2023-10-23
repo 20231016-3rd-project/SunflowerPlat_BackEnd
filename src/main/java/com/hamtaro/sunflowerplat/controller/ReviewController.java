@@ -24,5 +24,10 @@ public class ReviewController {
     public ResponseEntity<?> createReview(@RequestBody ReviewSaveDto reviewSaveDto, @RequestParam Long restaurantId){
         return reviewService.saveUserReview(reviewSaveDto, restaurantId);
     }
+    //리뷰 신고하기
+    @PostMapping("/report")
+    public ResponseEntity<?> alertReview(@RequestBody ReviewDto reviewDto, @RequestParam Long reviewId){
+        return null;
+    }
 
 }

@@ -102,5 +102,17 @@ public class ReviewService {
             return ResponseEntity.status(200).body(map);
         }
     }
+//        public ResponseEntity<?> reportReview(ReportDto reportDto, Long useId){
+//        RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(reportDto.getRestaurantId()).get();
+//        MemberEntity memberEntity = memberRepository.findById(useId).get();
+//        ReviewEntity reviewEntity = reviewRepository.findById(reportDto.getReviewId()).get();
+//        ReportEntity reportEntity = ReportEntity.builder()
+//                .reportCategory(reportDto.getReportCategory())
+//                .reportContent(reportDto.getReportContent())
+//                .reportAt(reportDto.getReportAt())
+//                .reviewEntity(reviewEntity)
+//                .memberEntity(memberEntity)
+//                .build();
+//    }
 
 }
