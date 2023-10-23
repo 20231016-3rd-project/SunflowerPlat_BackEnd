@@ -1,22 +1,19 @@
 package com.hamtaro.sunflowerplat.service;
 
+import com.hamtaro.sunflowerplat.dto.ReportDto;
 import com.hamtaro.sunflowerplat.dto.RequestDto;
 import com.hamtaro.sunflowerplat.dto.ReviewSaveDto;
 import com.hamtaro.sunflowerplat.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplat.entity.restaurant.RestaurantEntity;
-import com.hamtaro.sunflowerplat.entity.review.EmpathyEntity;
+import com.hamtaro.sunflowerplat.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplat.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplat.entity.review.ReviewEntity;
 import com.hamtaro.sunflowerplat.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -41,6 +38,8 @@ public class ReviewService {
     private final RestaurantRepository restaurantRepository;
 
     private final MemberRepository memberRepository;
+
+    private final ReportRepository reportRepository;
     //리뷰 삭제 맨 !
     public ResponseEntity<Map<String, String>> reviewDelete(Long reviewId) {
         Map<String, String> map = new HashMap<>();
@@ -138,7 +137,7 @@ public class ReviewService {
 //        }
         Map<String,String> map = new HashMap<>();
         Long result = reviewRepository.save(reviewSaveEntity).getReviewId();
-        Optional<ReviewEntity> findId = reviewRepository.findById(result);
+        Optional<ReviewEntity> findId = reviewRepository.findByReviewId(result);
         if (findId.isPresent()){
             map.put("message", "리뷰가 등록되었습니다.");
             return ResponseEntity.status(200).body(map);
@@ -147,17 +146,28 @@ public class ReviewService {
             return ResponseEntity.status(200).body(map);
         }
     }
-//        public ResponseEntity<?> reportReview(ReportDto reportDto, Long useId){
-//        RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(reportDto.getRestaurantId()).get();
-//        MemberEntity memberEntity = memberRepository.findById(useId).get();
-//        ReviewEntity reviewEntity = reviewRepository.findById(reportDto.getReviewId()).get();
-//        ReportEntity reportEntity = ReportEntity.builder()
-//                .reportCategory(reportDto.getReportCategory())
-//                .reportContent(reportDto.getReportContent())
-//                .reportAt(reportDto.getReportAt())
-//                .reviewEntity(reviewEntity)
-//                .memberEntity(memberEntity)
-//                .build();
-//    }
+        public ResponseEntity<?> reportReview(ReportDto reportDto, Long useId){
+        MemberEntity memberEntity = memberRepository.findById(useId).get();
+        ReviewEntity reviewEntity = reviewRepository.findByReviewId(reportDto.getReviewId()).get();
+        ReportEntity reportSaveEntity = ReportEntity.builder()
+                .reportCategory(reportDto.getReportCategory())
+                .reportContent(reportDto.getReportContent())
+                .reportAt(reportDto.getReportAt())
+                .reviewEntity(reviewEntity)
+                .memberEntity(memberEntity)
+                .build();
+            Map<String, String> map = new HashMap<>();
+            Long result = reportRepository.save(reportSaveEntity).getReportId();
+            Optional<ReportEntity> findByReportId = reportRepository.findByReportId(result);
+
+            if (findByReportId.isPresent()){
+                map.put("message", "신고가 접수되었습니다.");
+                return ResponseEntity.status(200).body(map);
+            }else {
+                map.put("message","신고가 접수되지 않았습니다.");
+                return ResponseEntity.status(200).body(map);
+            }
+
+    }
 
 }

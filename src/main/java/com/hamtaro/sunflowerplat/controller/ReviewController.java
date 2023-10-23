@@ -49,8 +49,8 @@ public class ReviewController {
     }
     //리뷰 신고하기
     @PostMapping("/report")
-    public ResponseEntity<?> alertReview(@RequestBody ReviewDto reviewDto, @RequestParam Long reviewId){
-        return null;
+    public ResponseEntity<?> alertReview(@RequestBody ReportDto reportDto, @RequestParam Long reviewId){
+        return reviewService.reportReview(reportDto, reviewId);
     }
 
 }
