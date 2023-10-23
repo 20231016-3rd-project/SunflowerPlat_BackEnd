@@ -2,7 +2,6 @@ package com.hamtaro.sunflowerplat.dto;
 
 import lombok.*;
 
-import javax.persistence.Column;
 import java.time.LocalDate;
 
 @Getter
@@ -11,6 +10,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportDto {
+    private Long restaurantId;
+
+    private Long reviewId;
+
+    private Long memberId;
 
     private String reportCategory;
 
