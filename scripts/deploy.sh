@@ -1,32 +1,31 @@
 #!/bin/bash
 
-# 작업 디렉토리를 /home/ec2-user/app으로 변경
-cd /home/ec2-user/app
+# Blue 를 기준으로 현재 떠있는 컨테이너를 체크한다.
+EXIST_BLUE=$(docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yaml ps | grep Up)
 
-export DOCKER_REGISTRY=bae3007 DOCKER_APP_NAME=back-zero-downtime IMAGE_TAG=latest
-
-EXIST_BLUE=$(docker compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yaml ps | grep Up)
-
+# 컨테이너 스위칭
 if [ -z "$EXIST_BLUE" ]; then
-    echo "blueis is not exist. so make blue container"
     echo "blue up"
-    docker compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yaml up -d
+    docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yaml up -d
     BEFORE_COMPOSE_COLOR="green"
     AFTER_COMPOSE_COLOR="blue"
-    echo "end"
 else
-    echo "blue is exist. so make green container"
     echo "green up"
-    docker compose -p ${DOCKER_APP_NAME}-green -f docker-compose.green.yaml up -d
+    docker-compose -p ${DOCKER_APP_NAME}-green -f docker-compose.green.yaml up -d
     BEFORE_COMPOSE_COLOR="blue"
     AFTER_COMPOSE_COLOR="green"
 fi
 
-sleep 20
+sleep 10
 
-EXIST_AFTER=$(docker compose -p ${DOCKER_APP_NAME}-${AFTER_COMPOSE_COLOR} -f docker-compose.${AFTER_COMPOSE_COLOR}.yaml ps | grep Up)
+# 새로운 컨테이너가 제대로 떴는지 확인
+EXIST_AFTER=$(docker-compose -p ${DOCKER_APP_NAME}-${AFTER_COMPOSE_COLOR} -f docker-compose.${AFTER_COMPOSE_COLOR}.yaml ps | grep Up)
 if [ -n "$EXIST_AFTER" ]; then
+  # nginx.config를 컨테이너에 맞게 변경해주고 reload 한다
+  cp /etc/nginx/nginx.${AFTER_COMPOSE_COLOR}.conf /etc/nginx/nginx.conf
+  nginx -s reload
 
-    docker compose -p ${DOCKER_APP_NAME}-${BEFORE_COMPOSE_COLOR} -f docker-compose.${BEFORE_COMPOSE_COLOR}.yaml down
-    echo "$BEFORE_COMPOSE_COLOR down"
+  # 이전 컨테이너 종료
+  docker-compose -p ${DOCKER_APP_NAME}-${BEFORE_COMPOSE_COLOR} -f docker-compose.${BEFORE_COMPOSE_COLOR}.yaml down
+  echo "$BEFORE_COMPOSE_COLOR down"
 fi
