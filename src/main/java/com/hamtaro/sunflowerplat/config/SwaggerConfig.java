@@ -13,26 +13,26 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
-@EnableSwagger2
-public class SwaggerConfig implements WebMvcConfigurer {
+public class SwaggerConfig {
 
     private ApiInfo swaggerInfo() {
         return new ApiInfoBuilder()
-                .title("Iot API")
-                .description("Iot API Docs")
+                .title("API - SunflowerPlate")
+                .description("API Description")
+                .version("v1.0.0")
                 .build();
     }
 
     @Bean
     public Docket swaggerApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
+                .useDefaultResponseMessages(false)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.hamtaro.sunflowerplat.controller"))
                 .paths(PathSelectors.any())
-                .build();
-
+                .build()
+                .apiInfo(swaggerInfo());
     }
-
 
 }
 
