@@ -46,8 +46,10 @@ public class ReviewController {
 
     //리뷰 작성 후 저장
     @PostMapping("/review/new")
-    public ResponseEntity<?> createReview(@RequestBody ReviewSaveDto reviewSaveDto, @RequestParam Long restaurantId){
-        return reviewService.saveUserReview(reviewSaveDto, restaurantId);
+    public ResponseEntity<?> createReview(@RequestPart("reviewSaveDto") ReviewSaveDto reviewSaveDto,
+                                          @RequestPart("imageFile") List<MultipartFile> imageFile,
+                                          @RequestParam Long restaurantId){
+        return reviewService.saveUserReview(reviewSaveDto,imageFile, restaurantId);
     }
 
     //리뷰 신고하기

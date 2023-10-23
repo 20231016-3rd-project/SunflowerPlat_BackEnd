@@ -1,5 +1,8 @@
 package com.hamtaro.sunflowerplat.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.hamtaro.sunflowerplat.dto.ReportDto;
 import com.hamtaro.sunflowerplat.dto.RequestDto;
 import com.hamtaro.sunflowerplat.dto.ReviewSaveDto;
@@ -8,12 +11,15 @@ import com.hamtaro.sunflowerplat.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplat.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplat.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplat.entity.review.ReviewEntity;
+import com.hamtaro.sunflowerplat.entity.review.ReviewImageEntity;
 import com.hamtaro.sunflowerplat.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -80,9 +86,9 @@ public class ReviewService {
     }
 
 
-//    private final AmazonS3Client amazonS3Client;
-//    @Value("${cloud.aws.s3.goods-bucket}")
-//    private String bucketName;
+    private final AmazonS3Client amazonS3Client;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
     private String createFileName(String fileName) {
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
@@ -96,7 +102,7 @@ public class ReviewService {
         }
     }
 
-    public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto, Long userId){
+    public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto,List<MultipartFile> imageFile, Long userId){
         RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(reviewSaveDto.getRestaurantId()).get();
         MemberEntity memberEntity = (memberRepository.findById(userId)).get();
         ReviewEntity reviewSaveEntity = ReviewEntity.builder()
@@ -106,35 +112,37 @@ public class ReviewService {
                 .memberEntity(memberEntity)
                 .restaurantEntity(restaurantEntity)
                 .build();
-//        ReviewEntity reviewEntity = reviewRepository.save(reviewSaveEntity);
-//        List<String> reviewImgFile = new ArrayList<>();
-//        for (MultipartFile multipartFile: imageFile){
-//
-//            String fileName = multipartFile.getOriginalFilename();
-//
-//            try{
-//                //이미지 객체 생성
-//                ObjectMetadata objectMetadata = new ObjectMetadata();
-//                objectMetadata.setContentType(multipartFile.getContentType());
-//                objectMetadata.setContentLength(multipartFile.getInputStream().available());
-//                String storedName = createFileName(fileName);
-//                amazonS3Client.putObject(new PutObjectRequest(bucketName,storedName,multipartFile.getInputStream(),objectMetadata));
-//                String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
-//                System.out.println(accessUrl);
-//
-//                //이미지 저장
-//                reviewImageRepository.save(ReviewImageEntity.builder()
-//                        .reviewOriginName(fileName)
-//                        .reviewStoredName(storedName)
-//                        .reviewOriginUrl(accessUrl)
-//                        .build());
-//
-//
-//            } catch (IOException e){
-//                throw new RuntimeException();
-//            }
-//            reviewImgFile.add(fileName);
-//        }
+        ReviewEntity reviewEntity = reviewRepository.save(reviewSaveEntity);
+        List<String> reviewImgFile = new ArrayList<>();
+        for (MultipartFile multipartFile: imageFile){
+
+            String fileName = multipartFile.getOriginalFilename();
+
+            try{
+                //이미지 객체 생성
+                ObjectMetadata objectMetadata = new ObjectMetadata();
+                objectMetadata.setContentType(multipartFile.getContentType());
+                objectMetadata.setContentLength(multipartFile.getInputStream().available());
+                String storedName = createFileName(fileName);
+                amazonS3Client.putObject(new PutObjectRequest(bucketName,storedName,multipartFile.getInputStream(),objectMetadata));
+                String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
+                System.out.println(accessUrl);
+
+                //이미지 저장
+                reviewImageRepository.save(ReviewImageEntity.builder()
+                        .reviewOriginName(fileName)
+                        .reviewStoredName(storedName)
+                        .reviewOriginUrl(accessUrl)
+                        .reviewEntity(reviewEntity)
+                        .build());
+
+            } catch (IOException e){
+                throw new RuntimeException();
+            }
+            reviewImgFile.add(fileName);
+        }
+
+
         Map<String,String> map = new HashMap<>();
         Long result = reviewRepository.save(reviewSaveEntity).getReviewId();
         Optional<ReviewEntity> findId = reviewRepository.findByReviewId(result);
