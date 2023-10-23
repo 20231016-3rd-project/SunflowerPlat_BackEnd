@@ -66,7 +66,7 @@ public class ReviewController {
         return reviewService.reportReview(reportDto, reviewId);
     }
 
-
+    //좋아요기능
     @PostMapping("/like")
     public ResponseEntity<?> likeButton(@RequestBody @Validated EmpathyDto empathyDto) throws Exception {
 

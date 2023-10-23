@@ -10,6 +10,7 @@ import com.hamtaro.sunflowerplat.repository.EmpathyRepository;
 import com.hamtaro.sunflowerplat.repository.MemberRepository;
 import com.hamtaro.sunflowerplat.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class EmpathyService {
@@ -45,7 +48,7 @@ public class EmpathyService {
         empathyRepository.save(count);
 
         //이미 좋아요 있으면 에러 반환
-        if (empathyRepository.findByMemberAndReview(memberEntity, reviewEntity).isPresent()) {
+        if (empathyRepository.findByMemberEntityAndReviewEntity(memberEntity, reviewEntity).isPresent()) {
             //409 에러 딱
             map.put("message", "이미 좋아요를 누르셨습니다.");
             return ResponseEntity.status(409).body(map);
