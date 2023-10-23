@@ -1,22 +1,17 @@
 package com.hamtaro.sunflowerplat.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.hamtaro.sunflowerplat.dto.ReportDto;
-import com.hamtaro.sunflowerplat.dto.ReviewDto;
+import com.hamtaro.sunflowerplat.dto.RequestDto;
 import com.hamtaro.sunflowerplat.dto.ReviewSaveDto;
 import com.hamtaro.sunflowerplat.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplat.entity.restaurant.RestaurantEntity;
-import com.hamtaro.sunflowerplat.entity.review.ReportEntity;
+import com.hamtaro.sunflowerplat.entity.review.EmpathyEntity;
+import com.hamtaro.sunflowerplat.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplat.entity.review.ReviewEntity;
-import com.hamtaro.sunflowerplat.entity.review.ReviewImageEntity;
-import com.hamtaro.sunflowerplat.repository.MemberRepository;
-import com.hamtaro.sunflowerplat.repository.RestaurantRepository;
-import com.hamtaro.sunflowerplat.repository.ReviewImageRepository;
-import com.hamtaro.sunflowerplat.repository.ReviewRepository;
+import com.hamtaro.sunflowerplat.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +22,65 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.*;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
 
+
     private final ReviewRepository reviewRepository;
+
+    private final RequestRepository requestRepository;
+
     private final ReviewImageRepository reviewImageRepository;
+
     private final RestaurantRepository restaurantRepository;
+
     private final MemberRepository memberRepository;
+    //리뷰 삭제 맨 !
+    public ResponseEntity<Map<String, String>> reviewDelete(Long reviewId) {
+        Map<String, String> map = new HashMap<>();
+        Optional<ReviewEntity> deleteById = reviewRepository.findById(reviewId);
+
+        if (deleteById.isPresent()) {
+            reviewRepository.deleteById(reviewId);
+            map.put("message", "리뷰가 삭제되었습니다.");
+            return ResponseEntity.status(200).body(map);
+        } else {
+            map.put("message", "이미 삭제 되었거나 존재하지 않는 리뷰입니다.");
+            return ResponseEntity.status(404).body(map);
+        }
+
+    }
+
+    public ResponseEntity<Map<String, String>> requestRestaurant(RequestDto requestDto, Long requestId) {
+        Map<String, String> hash = new HashMap<>();
+        Optional<RequestEntity> request = requestRepository.findById(requestId);
+        //TODO : 관리자 ID 한테 수정 내용 전달
+
+
+        if (request.isPresent()) {
+
+            RequestEntity modify = RequestEntity.builder()
+                    .requestId(requestDto.getRequestId())
+                    .requestAt(requestDto.getRequestAt())
+                    .requestContent(requestDto.getRequestContent())
+                    .build();
+
+            requestRepository.save(modify);
+            hash.put("message", "식당 정보 및 폐업 신고 요청이 되었습니다.");
+            return ResponseEntity.status(200).body(hash);
+        } else {
+            hash.put("message", "권한이 없습니다.");
+            return ResponseEntity.status(403).body(hash);
+        }
+    }
+
+
 //    private final AmazonS3Client amazonS3Client;
 //    @Value("${cloud.aws.s3.goods-bucket}")
 //    private String bucketName;
