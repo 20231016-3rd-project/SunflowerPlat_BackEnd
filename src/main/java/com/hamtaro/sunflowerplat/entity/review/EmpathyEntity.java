@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Builder
 @Table(name = "empathy")
 public class EmpathyEntity {
-
+//좋아요
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "empathy_id" )
