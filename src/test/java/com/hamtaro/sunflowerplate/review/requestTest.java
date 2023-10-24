@@ -1,8 +1,8 @@
-package com.hamtaro.sunflowerplat.review;
+package com.hamtaro.sunflowerplate.review;
 
 
 import com.hamtaro.sunflowerplate.dto.RequestDto;
-import com.hamtaro.sunflowerplat.entity.member.MemberEntity;
+import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.repository.RequestRepository;
 import com.hamtaro.sunflowerplate.service.ReviewService;
