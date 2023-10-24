@@ -1,61 +1,35 @@
 package com.hamtaro.sunflowerplate.entity.member;
 
-import com.hamtaro.sunflowerplate.entity.review.*;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Builder
 @Table(name = "member")
 public class MemberEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long memberId;
-
-    @Column(name = "member_email")
+    @Column(name = "member_email", length = 50, nullable = false, unique = true)
     private String memberEmail;
-
-    @Column(name = "member_password")
+    @Column(name = "member_password", length = 15, nullable = false)
     private String memberPassword;
-
-    @Column(name = "member_nickname")
-    private String memberNickname;
-
-    @Column(name = "member_phone")
+    @Column(name = "member_nickname", length = 20, nullable = false, unique = true)
+    private String memberNickName;
+    @Column(name = "member_phone", length = 13, nullable = false, unique = true)
     private String memberPhone;
-
-    @Column(name = "member_profile_picture")
+    @Column(name = "member_profile_picture", length = 100)
     private String memberProfilePicture;
-
-    @Column(name = "member_join_date")
-    private LocalDate memberJoinDate;
-    @Builder.Default
-    @Column(name = "member_state")
+    //사용자 활성화 상태
+    @Column(name = "status")
     private Boolean memberState = true;
 
-    @Column(name = "member_role")
+    @Column(name = "member_role", length = 10, nullable = false)
     private String memberRole;
-
-    @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<ReportEntity> reportEntityList;
-
-    @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<ReviewEntity> reviewEntityList;
-
-    @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<RequestEntity> requestEntityList;
-
-    @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<EmpathyEntity> empathyEntityList;
-
-    @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<LikeCountEntity> likeCountEntityList;
 }

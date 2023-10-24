@@ -32,7 +32,7 @@ public class MemberService {
                     MemberEntity memberEntity = MemberEntity.builder()
                             .memberEmail(memberSaveDto.getEmail())
                             .memberPassword(encPassword)
-                            .memberNickname(memberSaveDto.getNickName())
+                            .memberNickName(memberSaveDto.getNickName())
                             .memberProfilePicture("https://plate-user-img.s3.ap-northeast-2.amazonaws.com/BasicImage.png")
                             .memberPhone(memberSaveDto.getPhone())
                             .memberRole("USER")
@@ -78,7 +78,7 @@ public class MemberService {
     }
 
     public boolean findByNickName(String nickName) {
-        MemberEntity memberEntity = memberRepository.findByMemberNickname(nickName);
+        MemberEntity memberEntity = memberRepository.findByMemberNickName(nickName);
         if (memberEntity != null) {
             return false; // 중복된 닉네임
         } else {
