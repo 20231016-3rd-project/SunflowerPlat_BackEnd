@@ -19,7 +19,7 @@ import java.util.Map;
 
 @Log4j2
 @RestController
-@RequestMapping("sunflowerPlate/user")
+@RequestMapping("/sunflowerPlate/user")
 @RequiredArgsConstructor
 public class ReviewController {
 
