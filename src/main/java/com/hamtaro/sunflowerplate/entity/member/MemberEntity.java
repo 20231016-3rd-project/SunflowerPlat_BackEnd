@@ -1,10 +1,6 @@
-package com.hamtaro.sunflowerplat.entity.member;
+package com.hamtaro.sunflowerplate.entity.member;
 
-import com.hamtaro.sunflowerplat.entity.review.EmpathyEntity;
-import com.hamtaro.sunflowerplat.entity.review.LikeCountEntity;
-import com.hamtaro.sunflowerplat.entity.review.ReportEntity;
-import com.hamtaro.sunflowerplat.entity.review.RequestEntity;
-import com.hamtaro.sunflowerplat.entity.review.ReviewEntity;
+import com.hamtaro.sunflowerplate.entity.review.*;
 import lombok.*;
 
 import javax.persistence.*;
@@ -41,9 +37,9 @@ public class MemberEntity {
 
     @Column(name = "member_join_date")
     private LocalDate memberJoinDate;
-
+    @Builder.Default
     @Column(name = "member_state")
-    private Boolean memberState;
+    private Boolean memberState = true;
 
     @Column(name = "member_role")
     private String memberRole;
