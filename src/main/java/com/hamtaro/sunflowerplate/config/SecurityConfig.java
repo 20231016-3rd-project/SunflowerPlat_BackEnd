@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests(authorize ->
                         authorize
-                                .antMatchers("/user/**").permitAll()
+                                .antMatchers("/**").permitAll()
                                 .anyRequest().hasRole("USER")
                 )
                 .exceptionHandling();
