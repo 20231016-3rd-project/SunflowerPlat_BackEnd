@@ -34,18 +34,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewService {
 
-
     private final ReviewRepository reviewRepository;
-
     private final RequestRepository requestRepository;
-
     private final ReviewImageRepository reviewImageRepository;
-
     private final RestaurantRepository restaurantRepository;
-
     private final MemberRepository memberRepository;
-
     private final ReportRepository reportRepository;
+
     //리뷰 삭제 맨 !
     public ResponseEntity<Map<String, String>> reviewDelete(Long reviewId) {
         Map<String, String> map = new HashMap<>();
@@ -62,6 +57,7 @@ public class ReviewService {
 
     }
 
+    // 수정 요청
     public ResponseEntity<Map<String, String>> requestRestaurant(RequestDto requestDto, Long requestId) {
         Map<String, String> hash = new HashMap<>();
         Optional<RequestEntity> request = requestRepository.findById(requestId);
@@ -85,7 +81,7 @@ public class ReviewService {
         }
     }
 
-
+    //이미지 파일
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -93,7 +89,6 @@ public class ReviewService {
     private String createFileName(String fileName) {
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
     }
-    // file 형식이 잘못된 경우를 확인하기 위해 만들어진 로직이며, 파일 타입과 상관없이 업로드할 수 있게 하기 위해 .의 존재 유무만 판단하였습니다.
     private String getFileExtension(String filename) {
         try {
             return filename.substring(filename.lastIndexOf("."));
@@ -102,6 +97,7 @@ public class ReviewService {
         }
     }
 
+    //리뷰 작성 후 저장
     public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto,List<MultipartFile> imageFile, Long userId){
         RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(reviewSaveDto.getRestaurantId()).get();
         MemberEntity memberEntity = (memberRepository.findById(userId)).get();
@@ -154,6 +150,8 @@ public class ReviewService {
             return ResponseEntity.status(200).body(map);
         }
     }
+
+        //리뷰 신고
         public ResponseEntity<?> reportReview(ReportDto reportDto, Long useId){
         MemberEntity memberEntity = memberRepository.findById(useId).get();
         ReviewEntity reviewEntity = reviewRepository.findByReviewId(reportDto.getReviewId()).get();
