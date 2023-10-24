@@ -38,7 +38,7 @@ then
 fi
 
 # 3
-sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /home/ec2-user/service-url.inc
+sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/service-url.inc
 sudo nginx -s reload
 echo "Deploy Completed!!"
 
