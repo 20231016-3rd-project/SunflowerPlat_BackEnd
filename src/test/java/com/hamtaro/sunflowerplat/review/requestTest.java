@@ -1,22 +1,19 @@
 package com.hamtaro.sunflowerplat.review;
 
 
-import com.hamtaro.sunflowerplat.dto.RequestDto;
+import com.hamtaro.sunflowerplate.dto.RequestDto;
 import com.hamtaro.sunflowerplat.entity.member.MemberEntity;
-import com.hamtaro.sunflowerplat.entity.review.RequestEntity;
-import com.hamtaro.sunflowerplat.repository.RequestRepository;
-import com.hamtaro.sunflowerplat.service.ReviewService;
+import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
+import com.hamtaro.sunflowerplate.repository.RequestRepository;
+import com.hamtaro.sunflowerplate.service.ReviewService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.time.LocalDate;
-import java.util.Map;
 
 
 @RunWith(SpringRunner.class)
