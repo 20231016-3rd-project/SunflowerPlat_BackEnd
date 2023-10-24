@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplat.entity.member;
+package com.hamtaro.sunflowerplate.entity.member;
 
 import lombok.*;
 

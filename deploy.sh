@@ -1,19 +1,17 @@
-#!/bin/bash
-cd /home/ec2-user/app
-DOCKER_APP_NAME=sunflowerplate
-# 실행중인 blue가 있는지
-EXIST_BLUE=$(docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml ps | grep running)
-# green이 실행중이면 blue up
+EXIST_BLUE=$(docker-compose -p hospital-blue -f docker-compose.blue.yml ps | grep Up)
+
 if [ -z "$EXIST_BLUE" ]; then
-	echo "blue up"
-	docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml up -d --build
-	sleep 30
-	docker-compose -p ${DOCKER_APP_NAME}-green -f docker-compose.green.yml down
-	docker image prune -af # 사용하지 않는 이미지 삭제
+    docker-compose -p sunflowerplate-blue -f docker-compose.blue.yml up -d
+    BEFORE_COLOR="green"
+    AFTER_COLOR="blue"
+    BEFORE_PORT=8001
+    AFTER_PORT=8000
 else
-	echo "green up"
-	docker-compose -p ${DOCKER_APP_NAME}-green -f docker-compose.green.yml up -d --build
-	sleep 30
-	docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml down
-	docker image prune -af
+    docker-compose -p sunflowerplate-green -f docker-compose.green.yml up -d
+    BEFORE_COLOR="blue"
+    AFTER_COLOR="green"
+    BEFORE_PORT=8000
+    AFTER_PORT=8001
 fi
+
+echo "${AFTER_COLOR} server up(port:${AFTER_PORT})"

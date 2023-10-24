@@ -1,8 +1,8 @@
-package com.hamtaro.sunflowerplat.service.member;
+package com.hamtaro.sunflowerplate.service.member;
 
-import com.hamtaro.sunflowerplat.dto.member.MemberSaveDto;
-import com.hamtaro.sunflowerplat.entity.member.MemberEntity;
-import com.hamtaro.sunflowerplat.repository.member.MemberRepository;
+import com.hamtaro.sunflowerplate.dto.member.MemberSaveDto;
+import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
+import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

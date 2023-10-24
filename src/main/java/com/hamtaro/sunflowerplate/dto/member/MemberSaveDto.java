@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplat.dto.member;
+package com.hamtaro.sunflowerplate.dto.member;
 
 import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;

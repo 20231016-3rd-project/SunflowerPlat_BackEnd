@@ -1,9 +1,8 @@
-package com.hamtaro.sunflowerplat.controller.member;
+package com.hamtaro.sunflowerplate.controller.member;
 
-import com.hamtaro.sunflowerplat.dto.member.MemberSaveDto;
-import com.hamtaro.sunflowerplat.service.member.MemberService;
+import com.hamtaro.sunflowerplate.dto.member.MemberSaveDto;
+import com.hamtaro.sunflowerplate.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;

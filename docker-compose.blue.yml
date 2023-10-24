@@ -1,15 +1,16 @@
 version: '3.1'
 
 services:
-
   api:
-    image: ${DOCKER_REGISTRY}/${DOCKER_APP_NAME}:${IMAGE_TAG}
-
-    container_name: ${DOCKER_APP_NAME}-green
-
+    image: taeming/sunflowerplate:latest
+    container_name: sunflowerplate-blue
     environment:
       - LANG=ko_KR.UTF-8
-      - UWSGI_PORT=8000
-
+      - HTTP_PORT=9000
     ports:
-      - '8080:8000'
+      - '8080:8080'
+
+networks:
+  default:
+    name: service-network
+    external: true
