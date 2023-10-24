@@ -1,5 +1,6 @@
 package com.hamtaro.sunflowerplate.controller.member;
 
+import com.hamtaro.sunflowerplate.dto.member.MemberLoginDto;
 import com.hamtaro.sunflowerplate.dto.member.MemberSaveDto;
 import com.hamtaro.sunflowerplate.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,5 +53,11 @@ public class MemberController {
     public ResponseEntity<Boolean> nickNameCheck(@RequestBody Map<String, String> nickName) {
         boolean nicknameCheck = memberService.findByNickName(nickName.get("nickName"));
         return ResponseEntity.status(200).body(nicknameCheck);
+    }
+    @Tag(name = "로그인", description = "로그인관련 API")
+    @Operation(summary = "로그인", description = "로그인처리.")
+    @PostMapping("/login")
+    public ResponseEntity<Boolean> memberLogin(@RequestBody MemberLoginDto memberLoginDto) {
+        return memberService.memberLogin(memberLoginDto);
     }
 }

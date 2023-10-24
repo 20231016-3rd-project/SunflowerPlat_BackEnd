@@ -1,5 +1,6 @@
 package com.hamtaro.sunflowerplate.service.member;
 
+import com.hamtaro.sunflowerplate.dto.member.MemberLoginDto;
 import com.hamtaro.sunflowerplate.dto.member.MemberSaveDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
@@ -32,9 +33,9 @@ public class MemberService {
                             .memberEmail(memberSaveDto.getEmail())
                             .memberPassword(encPassword)
                             .memberNickName(memberSaveDto.getNickName())
-                            .profileImage("https://plate-user-img.s3.ap-northeast-2.amazonaws.com/BasicImage.png")
-                            .memberNumber(memberSaveDto.getPhone())
-                            .role("USER")
+                            .memberProfilePicture("https://plate-user-img.s3.ap-northeast-2.amazonaws.com/BasicImage.png")
+                            .memberPhone(memberSaveDto.getPhone())
+                            .memberRole("USER")
                             .build();
                     try {
                         memberRepository.save(memberEntity);
@@ -68,7 +69,7 @@ public class MemberService {
     }
 
     public boolean findByPhoneNumber(String telNumber) {
-        MemberEntity memberEntity = memberRepository.findByMemberNumber(telNumber);
+        MemberEntity memberEntity = memberRepository.findByMemberPhone(telNumber);
         if (memberEntity != null) {
             return false; // 중복된 전화번호
         } else {
@@ -83,5 +84,9 @@ public class MemberService {
         } else {
             return true; // 새로운 닉네임
         }
+    }
+
+    public ResponseEntity<Boolean> memberLogin(MemberLoginDto memberLoginDto) {
+        return null;
     }
 }

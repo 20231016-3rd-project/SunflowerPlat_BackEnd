@@ -22,14 +22,14 @@ public class MemberEntity {
     private String memberPassword;
     @Column(name = "member_nickname", length = 20, nullable = false, unique = true)
     private String memberNickName;
-    @Column(name = "member_number", length = 13, nullable = false, unique = true)
-    private String memberNumber;
-    @Column(name = "profile_image", length = 100)
-    private String profileImage;
+    @Column(name = "member_phone", length = 13, nullable = false, unique = true)
+    private String memberPhone;
+    @Column(name = "member_profile_picture", length = 100)
+    private String memberProfilePicture;
     //사용자 활성화 상태
     @Column(name = "status")
-    private Boolean status = true;
+    private Boolean memberState = true;
 
     @Column(name = "member_role", length = 10, nullable = false)
-    private String role;
+    private String memberRole;
 }
