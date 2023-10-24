@@ -1,5 +1,5 @@
 #1
-docker build --tag taeming/sunflowerplate -f Dockerfile /home/ec2-use/app/;
+docker build --tag taeming/sunflowerplate -f /home/ec2-user/app/Dockerfile /home/ec2-user/app/;
 docker push taeming/sunflowerplate:latest
 
 EXIST_BLUE=$('docker-compose' -p sunflowerplate-blue -f /home/ec2-user/app/docker-compose.blue.yml ps | grep Up)
