@@ -19,9 +19,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
 
@@ -30,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Log4j2
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -113,6 +116,7 @@ public class ReviewService {
         for (MultipartFile multipartFile: imageFile){
 
             String fileName = multipartFile.getOriginalFilename();
+            String fileFormatName = Objects.requireNonNull(multipartFile.getContentType()).substring(multipartFile.getContentType().lastIndexOf("/")+1);
 
             try{
                 //이미지 객체 생성
@@ -133,7 +137,7 @@ public class ReviewService {
                         .build());
 
             } catch (IOException e){
-                throw new RuntimeException();
+                throw new RuntimeException("이미지 업로드에 실패했습니다.");
             }
             reviewImgFile.add(fileName);
         }
