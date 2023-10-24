@@ -1,32 +1,47 @@
-#!/bin/bash
-cd /home/ec2-user/app
-
-export DOCKER_REGISTRY=sunflowerplate DOCKER_APP_NAME=back-zero-downtime IMAGE_TAG=latest
-
-EXIST_BLUE=$(docker compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml ps | grep Up)
+#1
+EXIST_BLUE=$('docker-compose' -p sunflowerplate-blue -f docker-compose.blue.yml ps | grep Up)
 
 if [ -z "$EXIST_BLUE" ]; then
-    echo "blueis is not exist. so make blue container"
-    echo "blue up"
-    docker compose --project-name ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml ps
-
-    BEFORE_COMPOSE_COLOR="green"
-    AFTER_COMPOSE_COLOR="blue"
-    echo "end"
+    docker-compose -p sunflowerplate-blue -f docker-compose.blue.yml up -d
+    BEFORE_COLOR="green"
+    AFTER_COLOR="blue"
+    BEFORE_PORT=8081
+    AFTER_PORT=8080
 else
-    echo "blue is exist. so make green container"
-    echo "green up"
-    docker compose --project-name ${DOCKER_APP_NAME}-green -f ocker-compose.green.yml ps
-
-    BEFORE_COMPOSE_COLOR="blue"
-    AFTER_COMPOSE_COLOR="green"
+    docker-compose -p sunflowerplate-green -f docker-compose.green.yml up -d
+    BEFORE_COLOR="blue"
+    AFTER_COLOR="green"
+    BEFORE_PORT=8080
+    AFTER_PORT=8081
 fi
 
-sleep 20
+echo "${AFTER_COLOR} server up(port:${AFTER_PORT})"
 
-EXIST_AFTER=$(docker compose -p ${DOCKER_APP_NAME}-${AFTER_COMPOSE_COLOR} -f docker-compose.${AFTER_COMPOSE_COLOR}.yml ps | grep Up)
-if [ -n "$EXIST_AFTER" ]; then
+# 2
+for cnt in {1..10}
+do
+    echo "서버 응답 확인중(${cnt}/10)";
+    UP=$(curl -s http://localhost:${AFTER_PORT}/api/check)
+    if [ -z "${UP}" ]
+        then
+            sleep 10
+            continue
+        else
+            break
+    fi
+done
 
-    docker compose -p ${DOCKER_APP_NAME}-${BEFORE_COMPOSE_COLOR} -f docker-compose.${BEFORE_COMPOSE_COLOR}.yml down
-    echo "$BEFORE_COMPOSE_COLOR down"
+if [ $cnt -eq 10 ]
+then
+    echo "서버가 정상적으로 구동되지 않았습니다."
+    exit 1
 fi
+
+# 3
+sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /home/ec2-user/service-url.inc
+sudo nginx -s reload
+echo "Deploy Completed!!"
+
+# 4
+echo "$BEFORE_COLOR server down(port:${BEFORE_PORT})"
+docker-compose -p sunflowerplate-${BEFORE_COLOR} -f docker-compose.${BEFORE_COLOR}.yml down
