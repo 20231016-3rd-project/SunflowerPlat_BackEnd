@@ -1,5 +1,5 @@
 #1
-EXIST_BLUE=$(docker-compose -p sunflowerplate-blue -f docker-compose.blue.yml ps | grep Up)
+EXIST_BLUE=$('docker-compose' -p sunflowerplate-blue -f docker-compose.blue.yml ps | grep Up)
 
 if [ -z "$EXIST_BLUE" ]; then
     docker-compose -p sunflowerplate-blue -f docker-compose.blue.yml up -d
