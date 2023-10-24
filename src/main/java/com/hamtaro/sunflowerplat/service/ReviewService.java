@@ -151,7 +151,7 @@ public class ReviewService {
             return ResponseEntity.status(200).body(map);
         }else {
             map.put("message","리뷰 등록에 실패하였습니다.");
-            return ResponseEntity.status(200).body(map);
+            return ResponseEntity.status(400).body(map);
         }
     }
 
@@ -175,7 +175,7 @@ public class ReviewService {
                 return ResponseEntity.status(200).body(map);
             }else {
                 map.put("message","신고가 접수되지 않았습니다.");
-                return ResponseEntity.status(200).body(map);
+                return ResponseEntity.status(400).body(map);
             }
 
     }
