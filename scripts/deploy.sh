@@ -1,14 +1,14 @@
 #1
-EXIST_BLUE=$('docker-compose' -p sunflowerplate-blue -f docker-compose.blue.yml ps | grep Up)
+EXIST_BLUE=$('docker-compose' -p sunflowerplate-blue -f /home/ec2-user/app/docker-compose.blue.yml ps | grep Up)
 
 if [ -z "$EXIST_BLUE" ]; then
-    docker-compose -p sunflowerplate-blue -f docker-compose.blue.yml up -d
+    docker-compose -p sunflowerplate-blue -f /home/ec2-user/app/docker-compose.blue.yml up -d
     BEFORE_COLOR="green"
     AFTER_COLOR="blue"
     BEFORE_PORT=8081
     AFTER_PORT=8080
 else
-    docker-compose -p sunflowerplate-green -f docker-compose.green.yml up -d
+    docker-compose -p sunflowerplate-green -f /home/ec2-user/app/docker-compose.green.yml up -d
     BEFORE_COLOR="blue"
     AFTER_COLOR="green"
     BEFORE_PORT=8080
@@ -44,4 +44,4 @@ echo "Deploy Completed!!"
 
 # 4
 echo "$BEFORE_COLOR server down(port:${BEFORE_PORT})"
-docker-compose -p sunflowerplate-${BEFORE_COLOR} -f docker-compose.${BEFORE_COLOR}.yml down
+docker-compose -p sunflowerplate-${BEFORE_COLOR} -f /home/ec2-user/app/docker-compose.${BEFORE_COLOR}.yml down
