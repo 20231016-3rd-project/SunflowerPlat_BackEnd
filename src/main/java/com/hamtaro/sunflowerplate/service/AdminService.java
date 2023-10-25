@@ -1,8 +1,10 @@
 package com.hamtaro.sunflowerplate.service;
 
 import com.hamtaro.sunflowerplate.dto.AdminReportDto;
+import com.hamtaro.sunflowerplate.dto.MemberResponseDto;
 import com.hamtaro.sunflowerplate.dto.ReportDto;
 import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
+import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
@@ -69,7 +71,7 @@ public class AdminService {
 
 
     //식당 정보 수정 요청 확인 TODO : 어떤값을 드려야 하는지 물어보기
-    public ResponseEntity<?> adminRestaurantModifyCheck() {
+    public ResponseEntity<?> adminRestaurantModifyCheck(){
 
         List<RequestEntity> byRequestId = requestRepository.findAll();
 
