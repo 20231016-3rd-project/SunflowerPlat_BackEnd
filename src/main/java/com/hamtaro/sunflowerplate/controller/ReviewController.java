@@ -1,11 +1,8 @@
 package com.hamtaro.sunflowerplate.controller;
 
-import com.hamtaro.sunflowerplate.dto.ReportDto;
-import com.hamtaro.sunflowerplate.dto.EmpathyDto;
-import com.hamtaro.sunflowerplate.dto.RequestDto;
+import com.hamtaro.sunflowerplate.dto.*;
 import com.hamtaro.sunflowerplate.service.EmpathyService;
 import com.hamtaro.sunflowerplate.service.ReviewService;
-import com.hamtaro.sunflowerplate.dto.ReviewSaveDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +33,13 @@ public class ReviewController {
         return reviewService.reviewDelete(reviewId);
     }
 
-    //리뷰 수정
-    //유저 레스토랑 정보 신고 및 수정
-    @PostMapping("/restaurant/edit/{requestId}")
-    public ResponseEntity<Map<String,String>> requestRestaurant(@PathVariable Long requestId ,
-                                                                @RequestBody RequestDto requestDto){
 
-        return reviewService.requestRestaurant(requestDto,requestId);
+    //유저 레스토랑 정보 신고 및 수정
+    @PostMapping("/restaurant/edit")
+    public ResponseEntity<Map<String,String>> requestRestaurant(@RequestParam Long requestId ,
+                                                                @RequestBody RequestUpdateDto requestUpdateDto){
+
+        return reviewService.requestRestaurant(requestUpdateDto,requestId);
     }
 
 

@@ -4,8 +4,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.hamtaro.sunflowerplate.dto.ReportDto;
-import com.hamtaro.sunflowerplate.dto.RequestDto;
 import com.hamtaro.sunflowerplate.dto.ReviewSaveDto;
+import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 import java.util.HashMap;
@@ -60,29 +61,35 @@ public class ReviewService {
 
     }
 
-    // 수정 요청
-    public ResponseEntity<Map<String, String>> requestRestaurant(RequestDto requestDto, Long requestId) {
-        Map<String, String> hash = new HashMap<>();
-        Optional<RequestEntity> request = requestRepository.findById(requestId);
+    //식당 정보 수정 요청(Modify x , Post)
+    public ResponseEntity<Map<String, String>> requestRestaurant(RequestUpdateDto requestUpdateDto, Long requestId) {
+
+        Long request_id = requestId;
+
+        Optional<RequestEntity> findByRequestId = requestRepository.findById(request_id);
+        MemberEntity memberEntity = memberRepository.findById(requestUpdateDto.getMemberId()).get();
+        RestaurantEntity restaurantEntity = restaurantRepository.findById(requestUpdateDto.getRestaurantId()).get();
         //TODO : 관리자 ID 한테 수정 내용 전달
 
 
-        if (request.isPresent()) {
-
-            RequestEntity modify = RequestEntity.builder()
-                    .requestId(requestDto.getRequestId())
-                    .requestAt(requestDto.getRequestAt())
-                    .requestContent(requestDto.getRequestContent())
+            RequestEntity reportEntity = RequestEntity.builder()
+                    .requestId(requestUpdateDto.getRequestId())
+                    .requestAt(LocalDate.now())
+                    .requestContent(requestUpdateDto.getRequestContent())
+                    .restaurantEntity(restaurantEntity)
+                    .memberEntity(memberEntity)
                     .build();
 
-            requestRepository.save(modify);
-            hash.put("message", "식당 정보 및 폐업 신고 요청이 되었습니다.");
-            return ResponseEntity.status(200).body(hash);
-        } else {
-            hash.put("message", "권한이 없습니다.");
-            return ResponseEntity.status(403).body(hash);
+
+
+            Map<String, String> map = new HashMap<>();
+
+            requestRepository.save(reportEntity);
+
+            map.put("message", "식당 정보 및 폐업 신고 요청이 되었습니다.");
+            return ResponseEntity.status(200).body(map);
         }
-    }
+
 
     //이미지 파일
     private final AmazonS3Client amazonS3Client;

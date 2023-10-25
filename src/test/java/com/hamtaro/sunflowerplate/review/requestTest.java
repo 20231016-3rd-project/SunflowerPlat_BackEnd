@@ -1,8 +1,10 @@
 package com.hamtaro.sunflowerplate.review;
 
 
-import com.hamtaro.sunflowerplate.dto.RequestDto;
+import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
+import com.hamtaro.sunflowerplate.dto.ReviewDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
+import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.repository.RequestRepository;
 import com.hamtaro.sunflowerplate.service.ReviewService;
@@ -44,14 +46,15 @@ public class requestTest {
     public void request() throws Exception {
         //given
         MemberEntity memberEntity = createMember();
-        RequestDto requestDto = new RequestDto();
+        ReportEntity reportEntity = new ReportEntity();
         RequestEntity requestEntity = new RequestEntity();
+        RequestUpdateDto requestUpdateDto = new RequestUpdateDto();
 
         //when
 
         requestEntity.setRequestContent("으아으어어");
 
-        reviewService.requestRestaurant(requestDto , requestEntity.getRequestId());
+        reviewService.requestRestaurant(requestUpdateDto , requestEntity.getRequestId());
 
         //then
             }
