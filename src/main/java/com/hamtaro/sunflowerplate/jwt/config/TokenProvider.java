@@ -9,12 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 
 @Slf4j
@@ -39,7 +43,7 @@ public class TokenProvider {
 
     public TokenDto createToken(Long userPk, LoginTokenSaveDto roles){
         Claims claims = Jwts.claims().setSubject(String.valueOf(userPk));
-        claims.put(ROLES,roles);
+        claims.put(ROLES,roles.getMemberRole());
 
         Date now = new Date();
 
@@ -69,7 +73,11 @@ public class TokenProvider {
     public Authentication getAuthentication(String token){
 
         Claims claims = parseClaims(token);
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.getSubject());
+        String role = (String)claims.get(ROLES);
+            GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
+//            UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.getSubject(),"", Collections.singletonList(authority));
+            UserDetails userDetails = new User(claims.getSubject(),"", Collections.singletonList(authority));
+
         return new UsernamePasswordAuthenticationToken(userDetails, "",userDetails.getAuthorities());
     }
 

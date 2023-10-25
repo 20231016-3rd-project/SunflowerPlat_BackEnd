@@ -25,7 +25,5 @@ public class AdminController {
 
 
         return adminService.adminReportCheck(reportDto,memberId);
-
     }
-
 }

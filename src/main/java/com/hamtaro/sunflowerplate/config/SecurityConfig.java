@@ -44,8 +44,10 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests(authorize ->
                         authorize
-                                .antMatchers("/**" , "/login**").permitAll()
+                                .antMatchers("/user*/**" , "/login*/**").permitAll()
+                                .antMatchers("/sunflowerPlate/admin/**").hasRole("ADMIN")
                                 .anyRequest().hasRole("USER")
+
                 )
                 .exceptionHandling()
                 .and()
