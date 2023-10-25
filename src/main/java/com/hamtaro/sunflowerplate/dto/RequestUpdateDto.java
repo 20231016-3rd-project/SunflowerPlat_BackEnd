@@ -20,6 +20,5 @@ public class RequestUpdateDto {
 
     private Long restaurantId;
 
-    private String reportCategory;
 
 }
