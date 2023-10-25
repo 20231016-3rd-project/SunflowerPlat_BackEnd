@@ -1,10 +1,7 @@
 package com.hamtaro.sunflowerplate.service;
 
 import com.hamtaro.sunflowerplate.dto.AdminReportDto;
-import com.hamtaro.sunflowerplate.dto.MemberResponseDto;
-import com.hamtaro.sunflowerplate.dto.ReportDto;
 import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
-import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
@@ -17,7 +14,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Log4j2
@@ -29,15 +25,15 @@ public class AdminService {
     private final ReportRepository reportRepository;
     private final RequestRepository requestRepository;
 
-    public ResponseEntity<?> deleteAdminReview(Long reviewId){
+    public ResponseEntity<?> deleteAdminReview(Long reviewId) {
         Map<String, String> result = new HashMap<>();
         Optional<ReviewEntity> deleteId = reviewRepository.findByReviewId(reviewId);
-        if (deleteId.isPresent()){
+        if (deleteId.isPresent()) {
             reviewRepository.deleteById(reviewId);
-            result.put("message","리뷰가 삭제되었습니다.");
+            result.put("message", "리뷰가 삭제되었습니다.");
             return ResponseEntity.status(200).body(result);
-        }else {
-            result.put("message","권한이 없습니다.");
+        } else {
+            result.put("message", "권한이 없습니다.");
             return ResponseEntity.status(403).body(result);
         }
 
@@ -71,7 +67,7 @@ public class AdminService {
 
 
     //식당 정보 수정 요청 확인 TODO : 어떤값을 드려야 하는지 물어보기
-    public ResponseEntity<?> adminRestaurantModifyCheck(){
+    public ResponseEntity<?> adminRestaurantModifyCheck() {
 
         List<RequestEntity> byRequestId = requestRepository.findAll();
 
