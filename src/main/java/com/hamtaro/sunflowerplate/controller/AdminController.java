@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/sunflowerPlate/admin")
 @RequiredArgsConstructor
 public class AdminController {
-
     private final AdminService adminService;
     @DeleteMapping("/review/delete")
     public ResponseEntity<?> removeAdminReview(@RequestParam Long reviewId){
