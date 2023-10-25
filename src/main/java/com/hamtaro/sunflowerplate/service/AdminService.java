@@ -1,7 +1,10 @@
 package com.hamtaro.sunflowerplate.service;
 
+import com.hamtaro.sunflowerplate.dto.AdminReportDto;
+import com.hamtaro.sunflowerplate.dto.MemberResponseDto;
 import com.hamtaro.sunflowerplate.dto.ReportDto;
 import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
+import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
@@ -42,20 +45,22 @@ public class AdminService {
 
 
     //관리자 신고내역 조회
-    public ResponseEntity<?> adminReportCheck(Long memberId) {
+    public ResponseEntity<?> adminReportCheck() {
 
+        List<ReportEntity> reportEntityList = reportRepository.findAll();
 
-        List<ReportEntity> reportEntityList = reportRepository.findByMemberEntity_MemberId(memberId);
-
-        List<ReportDto> reportDtoList = new ArrayList<>();
+        List<AdminReportDto> reportDtoList = new ArrayList<>();
 
         for (ReportEntity reportEntity : reportEntityList) {
 
-            ReportDto reportDos = ReportDto.builder()
+            AdminReportDto reportDos = AdminReportDto.builder()
                     .reviewId(reportEntity.getReportId())
+                    .reportContent(reportEntity.getReportContent())
                     .reportCategory(reportEntity.getReportCategory())
                     .reportAt(reportEntity.getReportAt())
-                    .memberId(reportEntity.getReportId())
+                    .nickName(reportEntity.getMemberEntity().getMemberNickname())
+                    .memberId(reportEntity.getMemberEntity().getMemberId())
+                    .memberProfilePicture(reportEntity.getMemberEntity().getMemberProfilePicture())
                     .build();
 
             reportDtoList.add(reportDos);
@@ -65,10 +70,10 @@ public class AdminService {
     }
 
 
-    //식당 정보 수정
-    public ResponseEntity<?> adminRestaurantModifyCheck(Long memberId){
+    //식당 정보 수정 요청 확인 TODO : 어떤값을 드려야 하는지 물어보기
+    public ResponseEntity<?> adminRestaurantModifyCheck(){
 
-        List<RequestEntity> byRequestId = requestRepository.findByMemberEntity_MemberId(memberId);
+        List<RequestEntity> byRequestId = requestRepository.findAll();
 
         List<RequestUpdateDto> requestUpdateDtoList = new ArrayList<>();
 
@@ -76,7 +81,9 @@ public class AdminService {
 
             RequestUpdateDto requestUpdateDto = RequestUpdateDto.builder()
                     .requestId(requestEntity.getRequestId())
-                    .requestAt(LocalDate.now())
+                    .requestAt(requestEntity.getRequestAt())
+                    .memberId(requestEntity.getMemberEntity().getMemberId())
+                    .restaurantId(requestEntity.getRestaurantEntity().getRestaurantId())
                     .requestContent(requestEntity.getRequestContent())
                     .build();
 

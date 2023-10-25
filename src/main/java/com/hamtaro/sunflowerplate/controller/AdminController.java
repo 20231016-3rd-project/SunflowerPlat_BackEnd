@@ -22,20 +22,20 @@ public class AdminController {
         return adminService.deleteAdminReview(reviewId);
     }
 
-    //관리자 리뷰 확인
-    @GetMapping("/review/{memberId}")
-    public ResponseEntity<?> reviewReport(@PathVariable Long memberId){
+    //관리자 신고 확인
+    @GetMapping("/review/")
+    public ResponseEntity<?> reviewReport(){
 
 
-        return adminService.adminReportCheck(memberId);
+        return adminService.adminReportCheck();
 
     }
 
-    //관리자 신고 확인
-    @GetMapping("/restaurant/edit/{memberId}")
-    public ResponseEntity<?> requestRestaurant(@PathVariable Long memberId){
+    //관리자 식당 정보 수정 요청 확인
+    @GetMapping("/restaurant/edit/")
+    public ResponseEntity<?> requestRestaurant(){
 
-        return adminService.adminRestaurantModifyCheck(memberId);
+        return adminService.adminRestaurantModifyCheck();
     }
 
 
