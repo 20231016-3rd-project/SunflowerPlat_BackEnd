@@ -1,7 +1,10 @@
 package com.hamtaro.sunflowerplate.controller.member;
 
+import com.hamtaro.sunflowerplate.dto.member.MemberEditDto;
 import com.hamtaro.sunflowerplate.dto.member.MemberLoginDto;
+import com.hamtaro.sunflowerplate.dto.member.MemberProfileDto;
 import com.hamtaro.sunflowerplate.dto.member.MemberSaveDto;
+import com.hamtaro.sunflowerplate.dto.member.kakao.KakaoTokenDto;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,14 +14,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 
@@ -30,6 +32,7 @@ import java.util.Map;
 public class MemberController {
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
+
     @Tag(name = "회원가입", description = "회원가입관련 API")
     @Operation(summary = "회원가입", description = "회원가입을 시킨다.")
     @ApiResponses(value = {
@@ -106,5 +109,46 @@ public class MemberController {
             }
         }
         return memberService.logout(userId);
+    }
+
+    @Tag(name = "로그인", description = "로그인관련 API")
+    @Operation(summary = "카카오 로그인", description = "카카오로그인 API")
+    @GetMapping("/kakao")
+    public ResponseEntity<?> kakaoLogin(@RequestParam("code") String code) {
+        KakaoTokenDto kakaoAccessToken = memberService.getKakaoAccessToken(code);
+        return memberService.kakaoLogin(kakaoAccessToken);
+    }
+
+    @Tag(name = "마이페이지", description = "마이페이지관련 API")
+    @Operation(summary = "회원 정보 요청", description = "회원수정 API")
+    @GetMapping("/userprofile")
+    public ResponseEntity<MemberProfileDto> userProfile(HttpServletRequest request) {
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        return memberService.userProfile(userId);
+    }
+
+    @Tag(name = "마이페이지", description = "마이페이지관련 API")
+    @Operation(summary = "회원 정보 수정", description = "회원수정 API")
+    @PutMapping("/")
+    public ResponseEntity<?> editMember(HttpServletRequest request, HttpServletResponse response, @ModelAttribute MemberEditDto memberEditDto,
+                                        @RequestParam(required = false) MultipartFile profileImage) {
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        if (profileImage != null) {
+            memberService.editMemberProfileImage(userId,memberEditDto,profileImage);
+        } else {
+            memberService.editMember(userId, memberEditDto);
+        }
+        return logout(request, response);
+    }
+    @Tag(name = "마이페이지", description = "마이페이지관련 API")
+    @Operation(summary = "회원탈퇴", description = "회원탈퇴 API")
+    @PostMapping("/withdraw")
+    public ResponseEntity<?> memberWithdrawal(HttpServletRequest request, HttpServletResponse response){
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        memberService.memberWithdrawal(userId);
+        return logout(request,response);
     }
 }

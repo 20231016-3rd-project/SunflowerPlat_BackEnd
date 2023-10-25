@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@Schema(description = "로그인BodyRequest")
 public class MemberLoginDto {
     @NotNull
     @Schema(description = "이메일", example = "로그인 할 이메일")

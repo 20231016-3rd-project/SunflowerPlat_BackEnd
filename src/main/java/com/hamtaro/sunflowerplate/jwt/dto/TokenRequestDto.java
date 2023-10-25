@@ -12,6 +12,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class TokenRequestDto {
 
+    @Schema(description = "회원 닉네임")
+    private String memberNickName;
     @Schema(description = "액세스 토큰")
     private String accessToken;
     @Schema(description = "액세스 토큰 생성 시간")

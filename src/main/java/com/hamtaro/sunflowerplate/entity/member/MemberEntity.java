@@ -1,5 +1,6 @@
 package com.hamtaro.sunflowerplate.entity.member;
 
+import com.hamtaro.sunflowerplate.entity.member.kakao.KakaoLoginEntity;
 import com.hamtaro.sunflowerplate.entity.review.*;
 import lombok.*;
 
@@ -29,7 +30,7 @@ public class MemberEntity {
     @Column(name = "member_nickname", nullable = false, unique = true, length = 20)
     private String memberNickname;
 
-    @Column(name = "member_phone", nullable = false, unique = true, length = 13)
+    @Column(name = "member_phone", unique = true, length = 13)
     private String memberPhone;
 
     @Column(name = "member_profile_picture", length = 100)
@@ -45,6 +46,10 @@ public class MemberEntity {
     @Column(name = "member_role")
     private String memberRole;
 
+    @OneToOne(mappedBy = "memberEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private KakaoLoginEntity kakaoLoginEntity;
+
+
     @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<ReportEntity> reportEntityList;
 
@@ -59,4 +64,24 @@ public class MemberEntity {
 
     @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<LikeCountEntity> likeCountEntityList;
+
+    public void setMemberNickname(String memberNickname) {
+        this.memberNickname = memberNickname;
+    }
+
+    public void setMemberPassword(String memberPassword) {
+        this.memberPassword = memberPassword;
+    }
+
+    public void setMemberPhone(String memberPhone) {
+        this.memberPhone = memberPhone;
+    }
+
+    public void setMemberProfilePicture(String memberProfilePicture) {
+        this.memberProfilePicture = memberProfilePicture;
+    }
+
+    public void setMemberState(Boolean memberState) {
+        this.memberState = memberState;
+    }
 }
