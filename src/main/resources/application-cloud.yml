@@ -6,4 +6,4 @@ cloud:
     region:
       static: ${cloud.aws.region.static}
     s3:
-      bucket : ${cloud.aws.s3.bucket}
+      user-bucket : ${cloud.aws.s3.user-bucket}

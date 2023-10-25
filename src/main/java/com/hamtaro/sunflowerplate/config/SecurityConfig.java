@@ -1,5 +1,7 @@
 package com.hamtaro.sunflowerplate.config;
 
+import com.hamtaro.sunflowerplate.jwt.config.JwtAuthenticationFilter;
+import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final TokenProvider tokenProvider;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -43,7 +47,10 @@ public class SecurityConfig {
                                 .antMatchers("/**").permitAll()
                                 .anyRequest().hasRole("USER")
                 )
-                .exceptionHandling();
+                .exceptionHandling()
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }

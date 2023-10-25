@@ -9,34 +9,35 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "member")
 public class MemberEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long memberId;
 
-    @Column(name = "member_email")
+    @Column(name = "member_email", nullable = false, unique = true, length = 50)
     private String memberEmail;
 
-    @Column(name = "member_password")
+    @Column(name = "member_password", nullable = false, length = 100)
     private String memberPassword;
 
-    @Column(name = "member_nickname")
+    @Column(name = "member_nickname", nullable = false, unique = true, length = 20)
     private String memberNickname;
 
-    @Column(name = "member_phone")
+    @Column(name = "member_phone", nullable = false, unique = true, length = 13)
     private String memberPhone;
 
-    @Column(name = "member_profile_picture")
+    @Column(name = "member_profile_picture", length = 100)
     private String memberProfilePicture;
 
     @Column(name = "member_join_date")
     private LocalDate memberJoinDate;
+
     @Builder.Default
     @Column(name = "member_state")
     private Boolean memberState = true;
