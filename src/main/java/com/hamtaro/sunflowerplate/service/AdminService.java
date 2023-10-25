@@ -27,7 +27,7 @@ public class AdminService {
         Map<String, String> result = new HashMap<>();
         Optional<ReviewEntity> deleteId = reviewRepository.findByReviewId(reviewId);
         if (deleteId.isPresent()){
-            reviewRepository.deleteByReviewId(reviewId);
+            reviewRepository.deleteById(reviewId);
             result.put("message","리뷰가 삭제되었습니다.");
             return ResponseEntity.status(200).body(result);
         }else {

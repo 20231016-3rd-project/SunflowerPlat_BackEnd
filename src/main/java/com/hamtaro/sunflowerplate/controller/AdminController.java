@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RestController
-@RequestMapping("sunflowerPlate/admin")
+@RequestMapping("/sunflowerPlate/admin")
 @RequiredArgsConstructor
 public class AdminController {
-
     private final AdminService adminService;
     @DeleteMapping("/review/delete")
     public ResponseEntity<?> removeAdminReview(@RequestParam Long reviewId){
