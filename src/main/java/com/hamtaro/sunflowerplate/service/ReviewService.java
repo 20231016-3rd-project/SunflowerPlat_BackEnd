@@ -169,7 +169,7 @@ public class ReviewService {
         ReportEntity reportSaveEntity = ReportEntity.builder()
                 .reportCategory(reportDto.getReportCategory())
                 .reportContent(reportDto.getReportContent())
-                .reportAt(reportDto.getReportAt())
+                .reportAt(LocalDate.now())
                 .reviewEntity(reviewEntity)
                 .memberEntity(memberEntity)
                 .build();
