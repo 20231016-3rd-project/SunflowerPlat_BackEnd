@@ -45,21 +45,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
 
-    //리뷰 삭제 맨 !
-    public ResponseEntity<Map<String, String>> reviewDelete(Long reviewId) {
-        Map<String, String> map = new HashMap<>();
-        Optional<ReviewEntity> deleteById = reviewRepository.findById(reviewId);
 
-        if (deleteById.isPresent()) {
-            reviewRepository.deleteById(reviewId);
-            map.put("message", "리뷰가 삭제되었습니다.");
-            return ResponseEntity.status(200).body(map);
-        } else {
-            map.put("message", "이미 삭제 되었거나 존재하지 않는 리뷰입니다.");
-            return ResponseEntity.status(404).body(map);
-        }
-
-    }
 
     //식당 정보 수정 요청(Modify x , Post)
     public ResponseEntity<Map<String, String>> requestRestaurant(RequestUpdateDto requestUpdateDto, Long requestId) {
@@ -69,7 +55,6 @@ public class ReviewService {
         Optional<RequestEntity> findByRequestId = requestRepository.findById(request_id);
         MemberEntity memberEntity = memberRepository.findById(requestUpdateDto.getMemberId()).get();
         RestaurantEntity restaurantEntity = restaurantRepository.findById(requestUpdateDto.getRestaurantId()).get();
-        //TODO : 관리자 ID 한테 수정 내용 전달
 
 
             RequestEntity reportEntity = RequestEntity.builder()

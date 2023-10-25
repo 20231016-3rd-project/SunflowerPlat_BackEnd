@@ -25,14 +25,6 @@ public class ReviewController {
 
     private final EmpathyService empathyService;
 
-    //유저 리뷰 삭제
-    //리뷰 삭제
-    @DeleteMapping("/review/{reviewId}")
-    public ResponseEntity<Map<String,String>> deleteReview(@PathVariable Long reviewId){
-
-        return reviewService.reviewDelete(reviewId);
-    }
-
 
     //유저 레스토랑 정보 신고 및 수정
     @PostMapping("/restaurant/edit")
