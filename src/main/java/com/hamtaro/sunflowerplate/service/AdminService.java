@@ -1,7 +1,9 @@
 package com.hamtaro.sunflowerplate.service;
 
 import com.hamtaro.sunflowerplate.dto.ReportDto;
+import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
+import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
 import com.hamtaro.sunflowerplate.repository.ReportRepository;
 import com.hamtaro.sunflowerplate.repository.RequestRepository;
@@ -12,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Log4j2
@@ -36,24 +39,49 @@ public class AdminService {
         }
 
     }
+
+
     //관리자 신고내역 조회
-    public ResponseEntity<?> adminReportCheck(ReportDto reportDto , String memberId) {
+    public ResponseEntity<?> adminReportCheck(Long memberId) {
 
 
-        List<ReportEntity> reportEntityList = reportRepository.findByMemberEntity_MemberId(Long.valueOf(memberId));
+        List<ReportEntity> reportEntityList = reportRepository.findByMemberEntity_MemberId(memberId);
 
         List<ReportDto> reportDtoList = new ArrayList<>();
+
         for (ReportEntity reportEntity : reportEntityList) {
-            ReportDto reportDtos = ReportDto.builder()
+
+            ReportDto reportDos = ReportDto.builder()
                     .reviewId(reportEntity.getReportId())
                     .reportCategory(reportEntity.getReportCategory())
                     .reportAt(reportEntity.getReportAt())
                     .memberId(reportEntity.getReportId())
                     .build();
 
-            reportDtoList.add(reportDtos);
+            reportDtoList.add(reportDos);
         }
 
         return ResponseEntity.status(200).body(reportDtoList);
+    }
+
+
+    //식당 정보 수정
+    public ResponseEntity<?> adminRestaurantModifyCheck(Long memberId){
+
+        List<RequestEntity> byRequestId = requestRepository.findByMemberEntity_MemberId(memberId);
+
+        List<RequestUpdateDto> requestUpdateDtoList = new ArrayList<>();
+
+        for (RequestEntity requestEntity : byRequestId) {
+
+            RequestUpdateDto requestUpdateDto = RequestUpdateDto.builder()
+                    .requestId(requestEntity.getRequestId())
+                    .requestAt(LocalDate.now())
+                    .requestContent(requestEntity.getRequestContent())
+                    .build();
+
+            requestUpdateDtoList.add(requestUpdateDto);
+        }
+        return ResponseEntity.status(200).body(requestUpdateDtoList);
     }
 }
