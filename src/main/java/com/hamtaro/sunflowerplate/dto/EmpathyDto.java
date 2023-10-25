@@ -15,5 +15,4 @@ public class EmpathyDto {
 
     private Long reviewId;
 
-    private Long restaurantId;
 }
