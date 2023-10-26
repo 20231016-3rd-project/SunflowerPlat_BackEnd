@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .authorizeRequests(authorize ->
                         authorize
                                 .antMatchers("/user*/**" , "/login*/**").permitAll()
-                                .antMatchers("/sunflowerPlate/admin/**").hasRole("ADMIN")
+                                .antMatchers("/sunflowerPlate/admin*/**" , "/**").hasRole("ADMIN")
                                 .anyRequest().hasRole("USER")
 
                 )
