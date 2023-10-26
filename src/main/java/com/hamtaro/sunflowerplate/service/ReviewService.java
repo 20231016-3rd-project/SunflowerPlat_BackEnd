@@ -48,11 +48,9 @@ public class ReviewService {
 
 
     //식당 정보 수정 요청(Modify x , Post)
-    public ResponseEntity<Map<String, String>> requestRestaurant(RequestUpdateDto requestUpdateDto, Long requestId) {
+    public ResponseEntity<Map<String, String>> requestRestaurant(RequestUpdateDto requestUpdateDto, String userId) {
 
-        Long request_id = requestId;
 
-        Optional<RequestEntity> findByRequestId = requestRepository.findById(request_id);
         MemberEntity memberEntity = memberRepository.findById(requestUpdateDto.getMemberId()).get();
         RestaurantEntity restaurantEntity = restaurantRepository.findById(requestUpdateDto.getRestaurantId()).get();
 

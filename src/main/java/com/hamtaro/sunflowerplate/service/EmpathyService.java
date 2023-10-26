@@ -29,7 +29,7 @@ public class EmpathyService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public ResponseEntity<Map<String, String>> countPlus(EmpathyDto empathyDto) throws Exception {
+    public ResponseEntity<Map<String, String>> countPlus(EmpathyDto empathyDto,String userId) throws Exception {
 
 
         MemberEntity memberEntity = memberRepository.findById(empathyDto.getMemberId())

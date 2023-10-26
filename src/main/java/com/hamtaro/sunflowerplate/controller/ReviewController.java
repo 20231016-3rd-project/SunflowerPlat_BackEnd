@@ -29,10 +29,13 @@ public class ReviewController {
 
     //유저 레스토랑 정보 신고 및 수정
     @PostMapping("/restaurant/edit")
-    public ResponseEntity<Map<String,String>> requestRestaurant(@RequestParam Long requestId ,
+    public ResponseEntity<Map<String,String>> requestRestaurant(HttpServletRequest request,
                                                                 @RequestBody RequestUpdateDto requestUpdateDto){
 
-        return reviewService.requestRestaurant(requestUpdateDto,requestId);
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+
+        return reviewService.requestRestaurant(requestUpdateDto,userId);
     }
 
 
@@ -54,8 +57,11 @@ public class ReviewController {
 
     //좋아요기능
     @PostMapping("/like")
-    public ResponseEntity<?> likeButton(@RequestBody @Validated EmpathyDto empathyDto) throws Exception {
+    public ResponseEntity<?> likeButton(@RequestBody @Validated EmpathyDto empathyDto, HttpServletRequest request) throws Exception {
 
-        return empathyService.countPlus(empathyDto);
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+
+        return empathyService.countPlus(empathyDto,userId);
     }
 }
