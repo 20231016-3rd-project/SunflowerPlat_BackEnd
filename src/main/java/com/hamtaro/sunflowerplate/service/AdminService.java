@@ -51,6 +51,8 @@ public class AdminService {
 
             AdminReportDto reportDos = AdminReportDto.builder()
                     .reviewId(reportEntity.getReportId())
+                    .reviewAuthor(reportEntity.getReviewEntity().getMemberEntity().getMemberNickname())
+                    .reviewProfilePicture(reportEntity.getReviewEntity().getMemberEntity().getMemberProfilePicture())
                     .reportContent(reportEntity.getReportContent())
                     .reportCategory(reportEntity.getReportCategory())
                     .reportAt(reportEntity.getReportAt())

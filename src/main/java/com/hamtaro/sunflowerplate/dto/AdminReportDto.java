@@ -17,6 +17,10 @@ public class AdminReportDto {
 
     private String nickName;
 
+    private String reviewAuthor;
+
+    private String reviewProfilePicture;
+
     private String memberProfilePicture;
 
     private String reportCategory;

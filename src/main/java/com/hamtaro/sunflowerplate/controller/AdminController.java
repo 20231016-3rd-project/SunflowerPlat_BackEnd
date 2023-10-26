@@ -2,6 +2,7 @@ package com.hamtaro.sunflowerplate.controller;
 
 
 import com.hamtaro.sunflowerplate.dto.ReportDto;
+import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,8 +25,7 @@ public class AdminController {
 
     //관리자 신고 확인
     @GetMapping("/review/")
-    public ResponseEntity<?> reviewReport(){
-
+    public ResponseEntity<?> reviewReport(HttpServletRequest request){
 
         return adminService.adminReportCheck();
 
