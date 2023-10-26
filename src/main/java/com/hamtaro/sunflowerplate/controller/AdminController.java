@@ -16,7 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/sunflowerPlate/admin")
 @RequiredArgsConstructor
 public class AdminController {
+
+
     private final AdminService adminService;
+    private final TokenProvider tokenProvider;
 
     @DeleteMapping("/review/delete")
     public ResponseEntity<?> removeAdminReview(@RequestParam Long reviewId){
@@ -25,17 +28,22 @@ public class AdminController {
 
     //관리자 신고 확인
     @GetMapping("/review/")
-    public ResponseEntity<?> reviewReport(HttpServletRequest request){
+    public ResponseEntity<?> reviewReport(HttpServletRequest request) {
 
-        return adminService.adminReportCheck();
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
 
+        return adminService.adminReportCheck(userId);
     }
 
     //관리자 식당 정보 수정 요청 확인
     @GetMapping("/restaurant/edit/")
-    public ResponseEntity<?> requestRestaurant(){
+    public ResponseEntity<?> requestRestaurant(HttpServletRequest request){
 
-        return adminService.adminRestaurantModifyCheck();
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+
+        return adminService.adminRestaurantModifyCheck(userId);
     }
 
 

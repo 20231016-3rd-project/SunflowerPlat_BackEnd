@@ -41,7 +41,7 @@ public class AdminService {
 
 
     //관리자 신고내역 조회
-    public ResponseEntity<?> adminReportCheck() {
+    public ResponseEntity<?> adminReportCheck(String userId) {
 
         List<ReportEntity> reportEntityList = reportRepository.findAll();
 
@@ -69,7 +69,7 @@ public class AdminService {
 
 
     //식당 정보 수정 요청 확인 TODO : 어떤값을 드려야 하는지 물어보기
-    public ResponseEntity<?> adminRestaurantModifyCheck() {
+    public ResponseEntity<?> adminRestaurantModifyCheck(String userId) {
 
         List<RequestEntity> byRequestId = requestRepository.findAll();
 
