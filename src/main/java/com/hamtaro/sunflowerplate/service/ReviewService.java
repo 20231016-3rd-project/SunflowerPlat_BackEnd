@@ -16,14 +16,22 @@ import com.hamtaro.sunflowerplate.repository.*;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import marvin.image.MarvinImage;
+import net.coobird.thumbnailator.Thumbnails;
+import org.marvinproject.image.transform.scale.Scale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -90,6 +98,49 @@ public class ReviewService {
         }
     }
 
+//    @Transactional
+//    public MultipartFile resizer(String resizeName, String fileName, MultipartFile imageFile
+//                                                                        , int targetWidth, int targetHeight){
+//        try {
+//            //MultipartFile -> BufferedImage
+//            BufferedImage bufferedImage = ImageIO.read(imageFile.getInputStream());
+//
+//            int originWidth = bufferedImage.getWidth();
+//            int originHeight = bufferedImage.getHeight();
+//
+//            // origin 이미지가 resizing될 사이즈보다 작을 경우 resizing 작업 안 함
+//            if (originWidth < targetWidth && originHeight < targetHeight)
+//                return imageFile;
+//
+//            //MockMultipartFile로 변환
+//            MarvinImage marvinImage = new MarvinImage();
+//
+//            Scale scale = new Scale();
+//            scale.load();
+//            scale.setAttribute("newWidth", targetWidth);
+//            scale.setAttribute("newHeight", targetHeight * originHeight / originWidth);
+//            scale.process(marvinImage.clone(), marvinImage, null, null, false);
+//
+//            BufferedImage imageNoAlpha = marvinImage.getBufferedImageNoAlpha();
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            ImageIO.write(imageNoAlpha,fileName,baos);
+//            baos.flush();
+//
+//            return new MockMultipartFile(resizeName, baos.toByteArray());
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException("리사이징에 실패했습니다.");
+//        }
+//    }
+
+    private File resizeImage(MultipartFile originalImage) throws IOException{
+        File resizeFile = new File("resized_" + originalImage.getOriginalFilename());
+        Thumbnails.of(originalImage.getInputStream())
+                .size(400, 400)
+                .toFile(resizeFile);
+        return resizeFile;
+    }
+
     //리뷰 작성 후 저장
     public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto, List<MultipartFile> imageFile, Long restaurantId, String userId){
 
@@ -103,11 +154,10 @@ public class ReviewService {
                 .restaurantEntity(restaurantEntity)
                 .build();
         ReviewEntity reviewEntity = reviewRepository.save(reviewSaveEntity);
-        List<String> reviewImgFile = new ArrayList<>();
+        Long reviewId = reviewEntity.getReviewId();
         for (MultipartFile multipartFile: imageFile){
 
-            String fileName = multipartFile.getOriginalFilename();
-            String fileFormatName = Objects.requireNonNull(multipartFile.getContentType()).substring(multipartFile.getContentType().lastIndexOf("/")+1);
+            String fileName = multipartFile.getOriginalFilename(); //원본 파일
 
             try{
                 //이미지 객체 생성
@@ -118,7 +168,21 @@ public class ReviewService {
 
                 amazonS3Client.putObject(new PutObjectRequest(bucketName,storedName,multipartFile.getInputStream(),objectMetadata));
                 String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
-                System.out.println(accessUrl);
+                System.out.println("Original Image URL:" + accessUrl);
+
+                //이미지 리사이징
+//                ObjectMetadata resizedOmd = new ObjectMetadata();
+//                resizedOmd.setContentLength(resizedImage.getSize()); //사이즈 전달
+//                resizedOmd.setContentType(resizedImage.getContentType()); //이미지 타입 전달
+//                String resizeName = getResizeFileName(createFileName(fileName));
+//                amazonS3Client.putObject(new PutObjectRequest(bucketName,resizeName,resizedImage.getInputStream(),resizedOmd));
+//                String resizeUrl = amazonS3Client.getUrl(bucketName,resizeName).toString();
+//                System.out.println("Resized Image URL:" + resizeUrl);
+
+                String resizeName = "resized_" + storedName;
+                File resizedImageFile = resizeImage(multipartFile);
+                amazonS3Client.putObject(bucketName,resizeName,resizedImageFile);
+                String resizeUrl = amazonS3Client.getUrl(bucketName,resizeName).toString();
 
                 //이미지 저장
                 reviewImageRepository.save(ReviewImageEntity.builder()
@@ -126,6 +190,7 @@ public class ReviewService {
                         .reviewStoredName(storedName)
                         .reviewResizeStoredName(resizeName)
                         .reviewOriginUrl(accessUrl)
+                        .reviewResizeUrl(resizeUrl)
                         .reviewEntity(reviewEntity)
                         .build());
 
@@ -135,7 +200,6 @@ public class ReviewService {
             } catch (IOException e){
                 throw new RuntimeException("이미지 업로드에 실패했습니다.");
             }
-            reviewImgFile.add(fileName);
         }
 
 
