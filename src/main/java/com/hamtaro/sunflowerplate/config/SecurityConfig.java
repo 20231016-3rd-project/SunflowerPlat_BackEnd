@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/v3/api-docs*/**", "/configuration/**", "/swagger*/**", "/webjars/**",
-                        "/**/favicon.ico", "/favicon.ico", "/error**").permitAll()
+                        "/**/favicon.ico", "/favicon.ico", "/error**" , "/api/**").permitAll()
                 .and()
                 .httpBasic().disable()
                 .csrf().disable()

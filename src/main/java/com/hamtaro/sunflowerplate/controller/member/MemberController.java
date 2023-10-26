@@ -45,7 +45,7 @@ public class MemberController {
         return ResponseEntity.status(200).body(emailCheck);
     }
     @Tag(name = "회원가입", description = "회원가입관련 API")
-    @Operation(summary = "닉네임중복확인", description = "닉네임 중복체크를 한다.")
+        @Operation(summary = "닉네임중복확인", description = "닉네임 중복체크를 한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임이 중복되면 false / 중복되지않으면 true")
     })
@@ -60,5 +60,4 @@ public class MemberController {
     public ResponseEntity<Boolean> memberLogin(@RequestBody MemberLoginDto memberLoginDto) {
         return memberService.memberLogin(memberLoginDto);
     }
-
 }
