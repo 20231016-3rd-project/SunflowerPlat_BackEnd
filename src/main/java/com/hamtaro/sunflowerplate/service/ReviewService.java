@@ -99,7 +99,7 @@ public class ReviewService {
         ReviewEntity reviewSaveEntity = ReviewEntity.builder()
                 .reviewContent(reviewSaveDto.getReviewContent())
                 .reviewStarRating(reviewSaveDto.getReviewStarRating())
-                .reviewAt(reviewSaveDto.getReviewAt())
+                .reviewAt(LocalDate.now())
                 .memberEntity(memberEntity)
                 .restaurantEntity(restaurantEntity)
                 .build();
