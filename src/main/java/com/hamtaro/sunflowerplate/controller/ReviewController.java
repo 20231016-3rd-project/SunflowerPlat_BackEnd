@@ -1,6 +1,7 @@
 package com.hamtaro.sunflowerplate.controller;
 
 import com.hamtaro.sunflowerplate.dto.*;
+import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.EmpathyService;
 import com.hamtaro.sunflowerplate.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import java.util.Map;
@@ -20,10 +22,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReviewController {
 
-
     private final ReviewService reviewService;
-
     private final EmpathyService empathyService;
+    private final TokenProvider tokenProvider;
 
 
     //유저 레스토랑 정보 신고 및 수정
@@ -39,8 +40,10 @@ public class ReviewController {
     @PostMapping("/review/new")
     public ResponseEntity<?> createReview(@RequestPart("reviewSaveDto") ReviewSaveDto reviewSaveDto,
                                           @RequestPart("imageFile") List<MultipartFile> imageFile,
-                                          @RequestParam Long restaurantId){
-        return reviewService.saveUserReview(reviewSaveDto,imageFile, restaurantId);
+                                          @RequestParam Long restaurantId, HttpServletRequest request){
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        return reviewService.saveUserReview(reviewSaveDto,imageFile, restaurantId, userId);
     }
 
     //리뷰 신고하기

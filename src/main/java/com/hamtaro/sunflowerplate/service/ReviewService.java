@@ -93,9 +93,9 @@ public class ReviewService {
     }
 
     //리뷰 작성 후 저장
-    public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto,List<MultipartFile> imageFile, Long userId){
-        RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(reviewSaveDto.getRestaurantId()).get();
-        MemberEntity memberEntity = (memberRepository.findById(userId)).get();
+    public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto, List<MultipartFile> imageFile, Long restaurantId, String userId){
+        RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(restaurantId).get();
+        MemberEntity memberEntity = (memberRepository.findById(Long.valueOf(userId))).get();
         ReviewEntity reviewSaveEntity = ReviewEntity.builder()
                 .reviewContent(reviewSaveDto.getReviewContent())
                 .reviewStarRating(reviewSaveDto.getReviewStarRating())
