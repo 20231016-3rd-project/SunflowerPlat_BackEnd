@@ -76,7 +76,7 @@ public class ReviewService {
 
     //이미지 파일
     private final AmazonS3Client amazonS3Client;
-    @Value("${cloud.aws.s3.user-bucket}")
+    @Value("${cloud.aws.s3.review-img}")
     private String bucketName;
 
     private String createFileName(String fileName) {
@@ -92,6 +92,7 @@ public class ReviewService {
 
     //리뷰 작성 후 저장
     public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto, List<MultipartFile> imageFile, Long restaurantId, String userId){
+
         RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(restaurantId).get();
         MemberEntity memberEntity = (memberRepository.findById(Long.valueOf(userId))).get();
         ReviewEntity reviewSaveEntity = ReviewEntity.builder()
@@ -114,6 +115,7 @@ public class ReviewService {
                 objectMetadata.setContentType(multipartFile.getContentType());
                 objectMetadata.setContentLength(multipartFile.getInputStream().available());
                 String storedName = createFileName(fileName);
+
                 amazonS3Client.putObject(new PutObjectRequest(bucketName,storedName,multipartFile.getInputStream(),objectMetadata));
                 String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
                 System.out.println(accessUrl);
@@ -122,10 +124,14 @@ public class ReviewService {
                 reviewImageRepository.save(ReviewImageEntity.builder()
                         .reviewOriginName(fileName)
                         .reviewStoredName(storedName)
+                        .reviewResizeStoredName(resizeName)
                         .reviewOriginUrl(accessUrl)
                         .reviewEntity(reviewEntity)
                         .build());
 
+                if(resizedImageFile != null && resizedImageFile.exists()){
+                    resizedImageFile.delete();
+                }
             } catch (IOException e){
                 throw new RuntimeException("이미지 업로드에 실패했습니다.");
             }
@@ -134,8 +140,7 @@ public class ReviewService {
 
 
         Map<String,String> map = new HashMap<>();
-        Long result = reviewRepository.save(reviewSaveEntity).getReviewId();
-        Optional<ReviewEntity> findId = reviewRepository.findByReviewId(result);
+      Optional<ReviewEntity> findId = reviewRepository.findById(reviewId);
         if (findId.isPresent()){
             map.put("message", "리뷰가 등록되었습니다.");
             return ResponseEntity.status(200).body(map);
