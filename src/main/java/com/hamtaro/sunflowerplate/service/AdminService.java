@@ -5,9 +5,10 @@ import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
-import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
+import com.hamtaro.sunflowerplate.entity.review.ReviewImageEntity;
 import com.hamtaro.sunflowerplate.repository.ReportRepository;
 import com.hamtaro.sunflowerplate.repository.RequestRepository;
+import com.hamtaro.sunflowerplate.repository.ReviewImageRepository;
 import com.hamtaro.sunflowerplate.repository.ReviewRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +26,23 @@ public class AdminService {
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
     private final RequestRepository requestRepository;
+    private final ReviewImageRepository reviewImageRepository;
+    private final ReviewService reviewService;
 
     public ResponseEntity<?> deleteAdminReview(Long reviewId) {
         Map<String, String> result = new HashMap<>();
-        Optional<ReviewEntity> deleteId = reviewRepository.findByReviewId(reviewId);
+        Optional<List<ReviewImageEntity>> deleteId = reviewImageRepository.findReviewImageEntityByReviewEntity_ReviewId(reviewId);
         if (deleteId.isPresent()) {
+            // 리뷰와 연결된 이미지를 삭제
+            for (ReviewImageEntity imageEntity : deleteId.get()) {
+                // S3에서 이미지를 삭제
+                reviewService.deleteS3Image(imageEntity.getReviewStoredName());
+                reviewService.deleteS3Image(imageEntity.getReviewResizeStoredName());
+            }
+            // 리뷰 삭제
             reviewRepository.deleteById(reviewId);
             result.put("message", "리뷰가 삭제되었습니다.");
+
             return ResponseEntity.status(200).body(result);
         } else {
             result.put("message", "권한이 없습니다.");
