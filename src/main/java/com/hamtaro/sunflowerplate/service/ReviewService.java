@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.hamtaro.sunflowerplate.dto.ReportDto;
 import com.hamtaro.sunflowerplate.dto.ReviewSaveDto;
 import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
+import com.hamtaro.sunflowerplate.dto.ReviewSaveDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
@@ -18,8 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,7 +49,6 @@ public class ReviewService {
     private final ReportRepository reportRepository;
 
 
-
     //식당 정보 수정 요청(Modify x , Post)
     public ResponseEntity<Map<String, String>> requestRestaurant(RequestUpdateDto requestUpdateDto, String userId) {
 
@@ -56,20 +56,20 @@ public class ReviewService {
 
         RestaurantEntity restaurantEntity = restaurantRepository.findById(requestUpdateDto.getRestaurantId()).get();
 
-            RequestEntity reportEntity = RequestEntity.builder()
-                    .requestAt(LocalDate.now())
-                    .requestContent(requestUpdateDto.getRequestContent())
-                    .memberEntity(findByMemberId)
-                    .restaurantEntity(restaurantEntity)
-                    .build();
+        RequestEntity reportEntity = RequestEntity.builder()
+                .requestAt(LocalDate.now())
+                .requestContent(requestUpdateDto.getRequestContent())
+                .memberEntity(findByMemberId)
+                .restaurantEntity(restaurantEntity)
+                .build();
 
-            Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
 
-            requestRepository.save(reportEntity);
+        requestRepository.save(reportEntity);
 
-            map.put("message", "식당 정보 및 폐업 신고 요청이 되었습니다.");
-            return ResponseEntity.status(200).body(map);
-        }
+        map.put("message", "식당 정보 및 폐업 신고 요청이 되었습니다.");
+        return ResponseEntity.status(200).body(map);
+    }
 
 
     //이미지 파일
@@ -121,7 +121,7 @@ public class ReviewService {
 
             String fileName = multipartFile.getOriginalFilename(); //원본 파일
 
-            try{
+            try {
                 //이미지 객체 생성
                 ObjectMetadata objectMetadata = new ObjectMetadata();
                 objectMetadata.setContentType(multipartFile.getContentType());

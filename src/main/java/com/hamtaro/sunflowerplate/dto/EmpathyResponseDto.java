@@ -7,13 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmpathyDto {
-
-//    private Long empathyId;
-//
-//    private Long memberId;
-//
-//    private Long reviewId;
+public class EmpathyResponseDto {
 
     private String message;
 }

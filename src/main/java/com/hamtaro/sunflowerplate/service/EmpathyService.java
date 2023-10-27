@@ -11,12 +11,11 @@ import com.hamtaro.sunflowerplate.repository.ReviewRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Log4j2
@@ -28,41 +27,45 @@ public class EmpathyService {
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
 
+
     @Transactional
-    public ResponseEntity<Map<String, String>> countPlus(EmpathyDto empathyDto,String userId) throws Exception {
+    public EmpathyDto countPlus(Long reviewId, String userId) {
 
 
-        MemberEntity memberEntity = memberRepository.findById(empathyDto.getMemberId())
-                .orElseThrow(() -> new NotFoundException("Could not found member id : " + empathyDto.getMemberId()));
 
-        ReviewEntity reviewEntity = reviewRepository.findById(empathyDto.getReviewId())
-                .orElseThrow(() -> new NotFoundException("Could not found review id : " + empathyDto.getReviewId()));
+        MemberEntity memberEntity = memberRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new NotFoundException("Could not found user id : "
+                        + memberRepository.findById(Long.valueOf(userId))));
 
-        Map<String, String> map = new HashMap<>();
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new NotFoundException("Could not found review id : "
+                        + reviewRepository.findById(reviewId)));
 
-        //memberEntity, reviewEntity 존재 할경우 다시 누르면 좋아요 취소
-        if (empathyRepository.findByMemberEntityAndReviewEntity(memberEntity, reviewEntity).isPresent()) {
+        EmpathyDto empathyResponse = new EmpathyDto();
+
+        // memberEntity가 reviewEntity를 이미 좋아요한 경우 좋아요를 다시 누르면 좋아요가 취소.
+        if (memberEntity.getEmpathyEntityList().stream()
+                .anyMatch(empathyEntity -> empathyEntity.getMemberEntity().equals(memberEntity))){
 
 
-            EmpathyEntity empathyEntities = empathyRepository.findById(empathyDto.getEmpathyId())
-                    .orElseThrow(() -> new NotFoundException("Could not found empathy id : "));
+            empathyRepository.deleteByMemberEntityAndReviewEntity(memberEntity, reviewEntity);
 
-            empathyRepository.delete(empathyEntities);
-
-            map.put("message", "좋아요 취소 되었습니다~");
-            return ResponseEntity.status(200).body(map);
+            empathyRepository.countByReviewEntity(reviewEntity);
+            empathyResponse.setMessage("좋아요 취소");
 
         } else {
-            EmpathyEntity count = EmpathyEntity.builder()
-                    .memberEntity(memberEntity)
+            empathyRepository.save(EmpathyEntity.builder()
                     .reviewEntity(reviewEntity)
-                    .build();
-            empathyRepository.save(count);
-        }
-        map.put("message", "좋아요~");
-        return ResponseEntity.status(200).body(map);
-    }
+                    .memberEntity(memberEntity)
+                    .build());
 
+            empathyRepository.countByReviewEntity(reviewEntity);
+            empathyResponse.setMessage("좋아요 성공");
+
+
+        }
+        return empathyResponse;
+    }
 }
 
 

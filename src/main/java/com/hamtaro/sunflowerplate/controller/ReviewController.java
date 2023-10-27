@@ -1,5 +1,6 @@
 package com.hamtaro.sunflowerplate.controller;
 
+import com.amazonaws.Response;
 import com.hamtaro.sunflowerplate.dto.*;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.EmpathyService;
@@ -44,6 +45,7 @@ public class ReviewController {
     public ResponseEntity<?> createReview(@RequestPart("reviewSaveDto") ReviewSaveDto reviewSaveDto,
                                           @RequestPart("imageFile") List<MultipartFile> imageFile,
                                           @RequestParam Long restaurantId, HttpServletRequest request){
+
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
         return reviewService.saveUserReview(reviewSaveDto,imageFile, restaurantId, userId);
@@ -52,16 +54,20 @@ public class ReviewController {
     //리뷰 신고하기
     @PostMapping("/report")
     public ResponseEntity<?> alertReview(@RequestBody ReportDto reportDto, @RequestParam Long reviewId){
+
         return reviewService.reportReview(reportDto, reviewId);
     }
 
     //좋아요기능
-    @PostMapping("/like")
-    public ResponseEntity<?> likeButton(@RequestBody @Validated EmpathyDto empathyDto, HttpServletRequest request) throws Exception {
+    @PostMapping("/{reviewId}/like")
+    public ResponseEntity<EmpathyDto> like(@PathVariable Long reviewId , HttpServletRequest request){
 
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
+        
+        EmpathyDto empathyDto = empathyService.countPlus(reviewId, userId);
 
-        return empathyService.countPlus(empathyDto,userId);
+        return ResponseEntity.ok(empathyDto);
+
     }
 }

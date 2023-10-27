@@ -9,5 +9,10 @@ import java.util.Optional;
 
 public interface EmpathyRepository extends JpaRepository<EmpathyEntity , Long> {
 
-       Optional<EmpathyEntity>findByMemberEntityAndReviewEntity(MemberEntity memberEntity , ReviewEntity reviewEntity);
+
+
+       void deleteByMemberEntityAndReviewEntity(MemberEntity memberEntity , ReviewEntity reviewEntity);
+
+       long countByReviewEntity(ReviewEntity reviewEntity);
+
 }
