@@ -58,20 +58,16 @@ public class ReviewService {
     //식당 정보 수정 요청(Modify x , Post)
     public ResponseEntity<Map<String, String>> requestRestaurant(RequestUpdateDto requestUpdateDto, String userId) {
 
+        MemberEntity findByMemberId = memberRepository.findById(Long.valueOf(userId)).get();
 
-        MemberEntity memberEntity = memberRepository.findById(requestUpdateDto.getMemberId()).get();
         RestaurantEntity restaurantEntity = restaurantRepository.findById(requestUpdateDto.getRestaurantId()).get();
 
-
             RequestEntity reportEntity = RequestEntity.builder()
-                    .requestId(requestUpdateDto.getRequestId())
                     .requestAt(LocalDate.now())
                     .requestContent(requestUpdateDto.getRequestContent())
+                    .memberEntity(findByMemberId)
                     .restaurantEntity(restaurantEntity)
-                    .memberEntity(memberEntity)
                     .build();
-
-
 
             Map<String, String> map = new HashMap<>();
 
