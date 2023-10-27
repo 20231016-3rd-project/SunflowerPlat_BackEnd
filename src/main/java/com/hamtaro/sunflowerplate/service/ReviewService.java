@@ -89,6 +89,7 @@ public class ReviewService {
         }
     }
 
+    //s3에 저장된 이미지 지우기
     public void deleteS3Image(String fileName) {
         amazonS3Client.deleteObject(bucketName, fileName);
     }
@@ -115,6 +116,7 @@ public class ReviewService {
                 .build();
         ReviewEntity reviewEntity = reviewRepository.save(reviewSaveEntity);
         Long reviewId = reviewEntity.getReviewId();
+
         for (MultipartFile multipartFile: imageFile){
 
             String fileName = multipartFile.getOriginalFilename(); //원본 파일
@@ -123,10 +125,10 @@ public class ReviewService {
                 //이미지 객체 생성
                 ObjectMetadata objectMetadata = new ObjectMetadata();
                 objectMetadata.setContentType(multipartFile.getContentType());
-                objectMetadata.setContentLength(multipartFile.getInputStream().available());
-                String storedName = createFileName(fileName);
+                objectMetadata.setContentLength(multipartFile.getSize());
 
                 //원본 파일 저장
+                String storedName = createFileName(fileName);
                 amazonS3Client.putObject(new PutObjectRequest(bucketName,storedName,multipartFile.getInputStream(),objectMetadata));
                 String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
                 System.out.println("Original Image URL:" + accessUrl);
@@ -147,8 +149,14 @@ public class ReviewService {
                         .reviewEntity(reviewEntity)
                         .build());
 
-                if(resizedImageFile != null && resizedImageFile.exists()){
-                    resizedImageFile.delete();
+                if (resizedImageFile != null && resizedImageFile.exists()) {
+                    if (resizedImageFile.delete()) {
+                        log.info("이미지 삭제됨");
+                    } else {
+                        log.info("이미지 삭제");
+                    }
+                } else {
+                    log.info("이미지파일 없음");
                 }
             } catch (IOException e){
                 throw new RuntimeException("이미지 업로드에 실패했습니다.");
