@@ -9,19 +9,21 @@ import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.entity.address.DongEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantMenuEntity;
+import com.hamtaro.sunflowerplate.entity.review.LikeCountEntity;
 import com.hamtaro.sunflowerplate.repository.DongRepository;
+import com.hamtaro.sunflowerplate.repository.LikeCountRepository;
 import com.hamtaro.sunflowerplate.repository.RestaurantMenuRepository;
 import com.hamtaro.sunflowerplate.repository.RestaurantRepository;
+import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,8 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final DongRepository dongRepository;
     private final RestaurantMenuRepository restaurantMenuRepository;
+    private final LikeCountRepository likeCountRepository;
+    private final MemberRepository memberRepository;
 
     public ResponseEntity<?> findRestaurantDetailsById(Long restaurantId) {
         Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
@@ -49,6 +53,8 @@ public class RestaurantService {
                         .build();
                 restaurantMenuDtoList.add(restaurantMenuDto);
             }
+
+
 
             RestaurantDetailDto restaurantDetailDto = RestaurantDetailDto
                     .builder()
@@ -105,10 +111,20 @@ public class RestaurantService {
 
     }
 
-    public ResponseEntity<Page<RestaurantDto>> findRestaurantByKeyword(String keyword, int page) {
-        Pageable pageable = PageRequest.of(page,10);
+    public ResponseEntity<Page<RestaurantDto>> findRestaurantByKeyword(int page, String keyword, String city, String district, String dong) {
+        Pageable pageable = PageRequest.of(page,10, Sort.by(Sort.Direction.DESC, "likeCountEntityList.size"));
         Page<RestaurantDto> restaurantDtoPage;
-        Page<RestaurantEntity> restaurantEntityPage= restaurantRepository.findByRestaurantName(pageable,keyword);
+        Page<RestaurantEntity> restaurantEntityPage;
+
+        if(dong != null){ // 동 이름 + 키워드 검색
+            restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable,keyword,dong);
+        } else if (district != null) { // 구 이름 + 키워드 검색
+            restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(pageable,keyword,district);
+        } else if (city != null) { // 시 이름 + 키워드 검색
+            restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(pageable, keyword, city);
+        } else { // 키워드 검색
+            restaurantEntityPage = restaurantRepository.findByRestaurantName(pageable,keyword);
+        }
 
         restaurantDtoPage = restaurantEntityPage
                 .map(this::restaurantEntityToRestaurantDto);

@@ -18,5 +18,5 @@ public class RestaurantDetailDto {
     private List<RestaurantMenuDto> restaurantMenuDtoList;
 //    private List<RestaurantImageDto> restaurantImageDtoList;
 
-
+//    private RestaurantLikeCountDto restaurantLikeCountDto;
 }
