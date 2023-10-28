@@ -6,7 +6,6 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.hamtaro.sunflowerplate.dto.ReportDto;
 import com.hamtaro.sunflowerplate.dto.ReviewSaveDto;
 import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
-import com.hamtaro.sunflowerplate.dto.ReviewSaveDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
@@ -175,8 +174,8 @@ public class ReviewService {
     }
 
         //리뷰 신고
-        public ResponseEntity<?> reportReview(ReportDto reportDto, Long useId){
-        MemberEntity memberEntity = memberRepository.findById(useId).get();
+        public ResponseEntity<?> reportReview(ReportDto reportDto, String useId){
+        MemberEntity memberEntity = memberRepository.findById(Long.valueOf(useId)).get();
         ReviewEntity reviewEntity = reviewRepository.findByReviewId(reportDto.getReviewId()).get();
         ReportEntity reportSaveEntity = ReportEntity.builder()
                 .reportCategory(reportDto.getReportCategory())

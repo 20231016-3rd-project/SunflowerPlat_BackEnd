@@ -17,13 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class AdminController {
 
-
     private final AdminService adminService;
     private final TokenProvider tokenProvider;
 
     @DeleteMapping("/review/delete")
-    public ResponseEntity<?> removeAdminReview(@RequestParam Long reviewId){
-        return adminService.deleteAdminReview(reviewId);
+    public ResponseEntity<?> removeAdminReview(@RequestParam Long reviewId, HttpServletRequest request){
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+
+        return adminService.deleteAdminReview(reviewId, userId);
     }
 
     //관리자 신고 확인
