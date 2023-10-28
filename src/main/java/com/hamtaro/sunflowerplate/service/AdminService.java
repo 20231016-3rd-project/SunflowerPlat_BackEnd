@@ -29,7 +29,7 @@ public class AdminService {
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewService reviewService;
 
-    public ResponseEntity<?> deleteAdminReview(Long reviewId) {
+    public ResponseEntity<?> deleteAdminReview(Long reviewId, String userId) {
         Map<String, String> result = new HashMap<>();
         Optional<List<ReviewImageEntity>> deleteId = reviewImageRepository.findReviewImageEntityByReviewEntity_ReviewId(reviewId);
         if (deleteId.isPresent()) {

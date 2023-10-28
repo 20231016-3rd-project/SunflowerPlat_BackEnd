@@ -1,6 +1,7 @@
 package com.hamtaro.sunflowerplate.controller;
 
 
+import com.hamtaro.sunflowerplate.dto.ReportDto;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class AdminController {
 
-
     private final AdminService adminService;
     private final TokenProvider tokenProvider;
 
     @DeleteMapping("/review/delete")
-    public ResponseEntity<?> removeAdminReview(@RequestParam Long reviewId) {
-        return adminService.deleteAdminReview(reviewId);
+    public ResponseEntity<?> removeAdminReview(@RequestParam Long reviewId, HttpServletRequest request){
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+
+        return adminService.deleteAdminReview(reviewId, userId);
     }
 
     //관리자 신고 확인
@@ -37,12 +40,13 @@ public class AdminController {
 
     //관리자 식당 정보 수정 요청 확인
     @GetMapping("/restaurant/edit/")
-    public ResponseEntity<?> requestRestaurant(HttpServletRequest request) {
+    public ResponseEntity<?> requestRestaurant(HttpServletRequest request){
 
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
 
         return adminService.adminRestaurantModifyCheck(userId);
     }
+
 
 }

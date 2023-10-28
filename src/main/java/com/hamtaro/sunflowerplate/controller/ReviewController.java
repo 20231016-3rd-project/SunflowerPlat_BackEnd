@@ -53,9 +53,11 @@ public class ReviewController {
 
     //리뷰 신고하기
     @PostMapping("/report")
-    public ResponseEntity<?> alertReview(@RequestBody ReportDto reportDto, @RequestParam Long reviewId){
+    public ResponseEntity<?> alertReview(@RequestBody ReportDto reportDto, HttpServletRequest request){
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
 
-        return reviewService.reportReview(reportDto, reviewId);
+        return reviewService.reportReview(reportDto,userId);
     }
 
     //좋아요기능
