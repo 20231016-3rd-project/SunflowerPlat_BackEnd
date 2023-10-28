@@ -80,7 +80,7 @@ public class AdminService {
     }
 
 
-    //식당 정보 수정 요청 확인 TODO : 어떤값을 드려야 하는지 물어보기
+    //식당 정보 수정 요청 확인 어떤값을 드려야 하는지 물어보기
     public ResponseEntity<?> adminRestaurantModifyCheck(String userId) {
 
 
