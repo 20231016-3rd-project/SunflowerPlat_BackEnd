@@ -9,11 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 public class EmpathyDto {
 
-//    private Long empathyId;
-//
-//    private Long memberId;
-//
-//    private Long reviewId;
-
     private String message;
+
+    private int count;
 }

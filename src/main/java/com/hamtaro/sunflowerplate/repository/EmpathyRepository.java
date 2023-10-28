@@ -13,6 +13,6 @@ public interface EmpathyRepository extends JpaRepository<EmpathyEntity , Long> {
 
        void deleteByMemberEntityAndReviewEntity(MemberEntity memberEntity , ReviewEntity reviewEntity);
 
-       long countByReviewEntity(ReviewEntity reviewEntity);
+       int countByReviewEntity(ReviewEntity reviewEntity);
 
 }

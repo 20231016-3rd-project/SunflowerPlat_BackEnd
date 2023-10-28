@@ -44,14 +44,17 @@ public class EmpathyService {
         EmpathyDto empathyResponse = new EmpathyDto();
 
         // memberEntity가 reviewEntity를 이미 좋아요한 경우 좋아요를 다시 누르면 좋아요가 취소.
+        int likeCount = empathyRepository.countByReviewEntity(reviewEntity);
+
         if (memberEntity.getEmpathyEntityList().stream()
                 .anyMatch(empathyEntity -> empathyEntity.getMemberEntity().equals(memberEntity))){
 
 
             empathyRepository.deleteByMemberEntityAndReviewEntity(memberEntity, reviewEntity);
 
-            empathyRepository.countByReviewEntity(reviewEntity);
+            likeCount--;
             empathyResponse.setMessage("좋아요 취소");
+
 
         } else {
             empathyRepository.save(EmpathyEntity.builder()
@@ -59,11 +62,13 @@ public class EmpathyService {
                     .memberEntity(memberEntity)
                     .build());
 
-            empathyRepository.countByReviewEntity(reviewEntity);
+            likeCount++;
             empathyResponse.setMessage("좋아요 성공");
 
 
         }
+
+        empathyResponse.setCount(likeCount);
         return empathyResponse;
     }
 }
