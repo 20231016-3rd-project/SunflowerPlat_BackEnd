@@ -22,7 +22,7 @@ public class MypageService {
 
     public ResponseEntity<?> clickLikeButton(Long restaurantId, Long memberId) {
         Map<String, Object> likeCountMap = new HashMap<>();
-        // 좋아요가 있는지 체크
+        // 좋아요가 있는지 체크렬
         Optional<LikeCountEntity> likeCountEntityOptional = likeCountRepository.findByMemberEntityAndRestaurantEntity(memberId,restaurantId);
         boolean checkLiked = likeCountEntityOptional.isPresent();
 

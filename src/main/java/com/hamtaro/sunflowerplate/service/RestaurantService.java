@@ -9,7 +9,6 @@ import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.entity.address.DongEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantMenuEntity;
-import com.hamtaro.sunflowerplate.entity.review.LikeCountEntity;
 import com.hamtaro.sunflowerplate.repository.DongRepository;
 import com.hamtaro.sunflowerplate.repository.LikeCountRepository;
 import com.hamtaro.sunflowerplate.repository.RestaurantMenuRepository;
@@ -22,10 +21,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RestaurantService {
 
@@ -35,6 +36,9 @@ public class RestaurantService {
     private final LikeCountRepository likeCountRepository;
     private final MemberRepository memberRepository;
 
+    // 이미지 S3 추가 필요
+
+    // 식당 정보 조회 - 리뷰 조회 추가 필요
     public ResponseEntity<?> findRestaurantDetailsById(Long restaurantId) {
         Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
 
@@ -54,8 +58,6 @@ public class RestaurantService {
                 restaurantMenuDtoList.add(restaurantMenuDto);
             }
 
-
-
             RestaurantDetailDto restaurantDetailDto = RestaurantDetailDto
                     .builder()
                     .restaurantName(restaurantEntity.getRestaurantName())
@@ -70,10 +72,10 @@ public class RestaurantService {
         }
     }
 
+    // 식당 정보 저장
     public ResponseEntity<?> saveRestaurant(RestaurantSaveDto restaurantSaveDto) {
 
         DongEntity dong = dongRepository.findByDongName(restaurantSaveDto.getRestaurantAdministrativeDistrict().getDongName()).get();
-
 
         RestaurantEntity restaurantEntity = RestaurantEntity.builder()
                 .restaurantName(restaurantSaveDto.getRestaurantName())
@@ -86,7 +88,6 @@ public class RestaurantService {
                 .build();
 
         Long restaurantId = restaurantRepository.save(restaurantEntity).getRestaurantId();
-
 
         List<RestaurantMenuDto> restaurantMenuDtoList = restaurantSaveDto.getRestaurantMenuDtoList();
         List<RestaurantMenuEntity> restaurantMenuEntityList = new ArrayList<>();
@@ -111,19 +112,36 @@ public class RestaurantService {
 
     }
 
-    public ResponseEntity<Page<RestaurantDto>> findRestaurantByKeyword(int page, String keyword, String city, String district, String dong) {
-        Pageable pageable = PageRequest.of(page,10, Sort.by(Sort.Direction.DESC, "likeCountEntityList.size"));
+    // 식당 검색 - 리뷰 많은순, 별점 순 정렬 필요, 좋아요 순 완료
+    public ResponseEntity<Page<RestaurantDto>> findRestaurantByKeyword (int page, String sort, String keyword, String city, String district, String dong) {
+        Pageable pageable;
         Page<RestaurantDto> restaurantDtoPage;
         Page<RestaurantEntity> restaurantEntityPage;
 
-        if(dong != null){ // 동 이름 + 키워드 검색
-            restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable,keyword,dong);
-        } else if (district != null) { // 구 이름 + 키워드 검색
-            restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(pageable,keyword,district);
-        } else if (city != null) { // 시 이름 + 키워드 검색
-            restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(pageable, keyword, city);
-        } else { // 키워드 검색
-            restaurantEntityPage = restaurantRepository.findByRestaurantName(pageable,keyword);
+        if(sort.equals("rateDesc")) { // 별점 순 정렬
+            pageable = PageRequest.of(page,10);
+            if(dong != null){ // 동 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongNameAndRate(pageable,keyword,dong);
+            } else if (district != null) { // 구 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndRate(pageable,keyword,district);
+            } else if (city != null) { // 시 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndRate(pageable, keyword, city);
+            } else { // 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRate(pageable,keyword);
+            }
+        } else {
+            String properties = sort.equals("like") ? "likeCountEntityList.size" : "reviewEntityList.size";
+            pageable = PageRequest.of(page,10, Sort.by(Sort.Direction.DESC, properties));
+
+            if(dong != null){ // 동 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable,keyword,dong);
+            } else if (district != null) { // 구 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(pageable,keyword,district);
+            } else if (city != null) { // 시 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(pageable, keyword, city);
+            } else { // 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantName(pageable,keyword);
+            }
         }
 
         restaurantDtoPage = restaurantEntityPage
@@ -131,6 +149,7 @@ public class RestaurantService {
         return ResponseEntity.status(200).body(restaurantDtoPage);
     }
 
+    // 지역 검색
     public ResponseEntity<Page<RestaurantDto>> findRestaurantByAddress(String add, int page) {
         Pageable pageable = PageRequest.of(page,10);
         Page<RestaurantDto> restaurantDtoPage;
@@ -140,19 +159,21 @@ public class RestaurantService {
         return ResponseEntity.status(200).body(restaurantDtoPage);
     }
 
+    // Entity -> Dto
     private RestaurantDto restaurantEntityToRestaurantDto(RestaurantEntity restaurantEntity){
-        RestaurantDto restaurantDto = RestaurantDto
+        return RestaurantDto
                 .builder()
                 .restaurantId(restaurantEntity.getRestaurantId())
                 .restaurantName(restaurantEntity.getRestaurantName())
                 .restaurantAddress(restaurantEntity.getRestaurantAddress())
                 .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
+                .likeCount(restaurantEntity.getLikeCountEntityList().size())
+                .reviewCount(restaurantEntity.getReviewEntityList().size())
+                .avgStarRate(restaurantRepository.findStarRateByRestaurantId(restaurantEntity.getRestaurantId()))
                 .build();
-        return restaurantDto;
     }
 
-
-
+    // 식당 정보 수정
     public ResponseEntity<?> updateRestaurantInfo(Long restaurantId, UpdateRestaurantInfoDto restaurantDto) {
         Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
         if (restaurantEntityOptional.isEmpty()) {
@@ -173,6 +194,7 @@ public class RestaurantService {
             // 기존 메뉴 엔티티 삭제
             List<RestaurantMenuEntity> existingMenuEntityList = restaurantEntity.getRestaurantMenuEntity();
             restaurantMenuRepository.deleteAll(existingMenuEntityList);//  기존 메뉴 엔티티 리스트 삭제
+            restaurantEntity.getRestaurantMenuEntity().clear();
 
             // 수정할 메뉴 dto -> entity 변환
             List<RestaurantMenuEntity> restaurantMenuEntityList = new ArrayList<>();

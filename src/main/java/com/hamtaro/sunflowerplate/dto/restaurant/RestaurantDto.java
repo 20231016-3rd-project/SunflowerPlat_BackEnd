@@ -4,6 +4,7 @@ import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuDto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Builder
@@ -15,4 +16,7 @@ public class RestaurantDto {
     private String restaurantAddress;
     private String restaurantWebSite;
 //    private String ImageUrl;
+    private int likeCount;
+    private int reviewCount;
+    private BigDecimal avgStarRate;
 }

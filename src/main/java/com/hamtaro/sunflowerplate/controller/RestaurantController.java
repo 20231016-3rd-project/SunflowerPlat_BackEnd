@@ -27,11 +27,12 @@ public class RestaurantController {
     @GetMapping("/search")
     public ResponseEntity<Page<RestaurantDto>> findRestaurantList (
             @RequestParam String keyword,
+            @RequestParam(defaultValue = "rateDesc") String sort,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String district,
             @RequestParam(required = false) String dong,
             @RequestParam(defaultValue = "1") int page ){
-        return restaurantService.findRestaurantByKeyword(page-1, keyword, city, district, dong);
+        return restaurantService.findRestaurantByKeyword(page-1, sort, keyword, city, district, dong);
     }
 
     @GetMapping("/address")

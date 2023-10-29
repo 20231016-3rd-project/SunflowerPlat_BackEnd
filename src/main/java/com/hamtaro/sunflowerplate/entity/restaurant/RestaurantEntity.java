@@ -47,7 +47,7 @@ public class RestaurantEntity {
     @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<RestaurantImageEntity> restaurantImageEntity = new ArrayList<>();
 
-    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity",cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
     private List<RestaurantMenuEntity> restaurantMenuEntity = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
