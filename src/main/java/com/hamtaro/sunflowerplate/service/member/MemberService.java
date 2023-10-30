@@ -4,14 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.hamtaro.sunflowerplate.config.GoogleOauth;
 import com.hamtaro.sunflowerplate.dto.member.MemberEditDto;
 import com.hamtaro.sunflowerplate.dto.member.MemberLoginDto;
 import com.hamtaro.sunflowerplate.dto.member.MemberProfileDto;
 import com.hamtaro.sunflowerplate.dto.member.MemberSaveDto;
+import com.hamtaro.sunflowerplate.dto.member.google.GoogleDto;
+import com.hamtaro.sunflowerplate.dto.member.google.GoogleTokenDto;
 import com.hamtaro.sunflowerplate.dto.member.kakao.KakaoTokenDto;
 import com.hamtaro.sunflowerplate.dto.member.kakao.LoginResponseDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.dto.member.kakao.KakaoAccountDto;
+import com.hamtaro.sunflowerplate.entity.member.google.GoogleEntity;
 import com.hamtaro.sunflowerplate.entity.member.kakao.KakaoLoginEntity;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.jwt.dto.LoginTokenSaveDto;
@@ -22,6 +26,7 @@ import com.hamtaro.sunflowerplate.jwt.exception.CRefreshTokenException;
 import com.hamtaro.sunflowerplate.jwt.exception.CUserNotFoundException;
 import com.hamtaro.sunflowerplate.jwt.repository.RefreshTokenRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
+import com.hamtaro.sunflowerplate.repository.member.google.GoogleRepository;
 import com.hamtaro.sunflowerplate.repository.member.kakao.KakaoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,10 +54,12 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final KakaoRepository kakaoRepository;
+    private final GoogleRepository googleRepository;
+    private final TokenProvider tokenProvider;
     private final MemberImageService memberImageService;
+    private final GoogleOauth googleOauth;
 
     @Value("${kakao.auth.clientId}")
     private String clientId;
@@ -297,10 +304,16 @@ public class MemberService {
         try {
             if (existOwner.isEmpty()) {
                 KakaoLoginEntity loginEntity = kakaoRepository.save(kakaoLoginEntity);
-            }
 
-            Optional<RefreshTokenEntity> optionalRefreshToken = refreshTokenRepository.findByMemberEntityMemberId(kakaoLoginEntity.getMemberEntity().getMemberId());
-            if (optionalRefreshToken.isEmpty()) {
+                ResponseCookie cookie = ResponseCookie.from("kakaoLogin", String.valueOf(loginEntity.getKakaoId()))
+                        .maxAge(7 * 24 * 60 * 60)
+                        .path("/")
+                        .secure(true)
+                        .sameSite("None")
+                        .httpOnly(true)
+                        .build();
+                return ResponseEntity.status(200).header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
+            } else {
                 MemberEntity memberEntity = memberRepository.findById(existOwner.get().getMemberEntity().getMemberId()).get();
                 LoginTokenSaveDto tokenSaveDto = LoginTokenSaveDto.builder()
                         .id(memberEntity.getMemberId())
@@ -314,14 +327,12 @@ public class MemberService {
                         .memberEntity(memberEntity)
                         .build();
                 refreshTokenRepository.save(refreshTokenEntity);
-
                 TokenRequestDto tokenRequestDto = TokenRequestDto.builder()
                         .memberNickName(memberEntity.getMemberNickname())
                         .accessToken(newCreatedToken.getAccessToken())
                         .accessTokenExpireDate(newCreatedToken.getAccessTokenExpireDate())
                         .issuedAt(newCreatedToken.getIssuedAt())
                         .build();
-
                 ResponseCookie cookie = ResponseCookie.from("refreshToken", newCreatedToken.getRefreshToken())
                         .maxAge(7 * 24 * 60 * 60)
                         .path("/")
@@ -330,8 +341,6 @@ public class MemberService {
                         .httpOnly(true)
                         .build();
                 return ResponseEntity.status(200).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(tokenRequestDto);
-            } else {
-                return null;
             }
         } catch (Exception e) {
             return null;
@@ -457,16 +466,76 @@ public class MemberService {
         }
         memberRepository.save(memberEntity);
     }
+
     @Transactional
     public void memberWithdrawal(String userId) {
         MemberEntity memberEntity = memberRepository.findById(Long.valueOf(userId)).get();
         memberEntity.setMemberState(false);
         memberEntity.setMemberPhone(null);
         kakaoRepository.deleteByMemberEntityMemberId(memberEntity.getMemberId());
-        if(!memberEntity.getMemberProfilePicture().equals(defaultMemberImage)){
+        if (!memberEntity.getMemberProfilePicture().equals(defaultMemberImage)) {
             memberImageService.deleteImageFromS3(memberEntity.getMemberProfilePicture());
             memberEntity.setMemberProfilePicture(defaultMemberImage);
         }
         memberRepository.save(memberEntity);
+    }
+
+    private GoogleDto getUserInfo(String code) throws JsonProcessingException {
+        ResponseEntity<String> accessToken = googleOauth.requestAccessToken(code);
+        GoogleTokenDto tokenDto = googleOauth.getAccessToken(accessToken);
+        ResponseEntity<String> userInfo = googleOauth.requestUserInfo(tokenDto);
+        GoogleDto googleDto = googleOauth.getUserInfo(userInfo);
+        return googleDto;
+    }
+
+
+    public ResponseEntity<?> googleLogin(String code) throws JsonProcessingException {
+        GoogleDto googleDto = getUserInfo(code);
+        Optional<GoogleEntity> googleEntity = googleRepository.findByGoogleId(googleDto.getId());
+        if (googleEntity.isEmpty()){
+            GoogleEntity googleSaveEntity = GoogleEntity.builder()
+                    .googleId(googleDto.getId())
+                    .email(googleDto.getEmail())
+                    .build();
+            Long id = googleRepository.save(googleSaveEntity).getId();
+            ResponseCookie cookie = ResponseCookie.from("kakaoLogin", String.valueOf(id))
+                    .maxAge(7 * 24 * 60 * 60)
+                    .path("/")
+                    .secure(true)
+                    .sameSite("None")
+                    .httpOnly(true)
+                    .build();
+            return ResponseEntity.status(200).header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
+        }else{
+            GoogleEntity googleEntity1 = googleEntity.get();
+            MemberEntity memberEntity = memberRepository.findById(googleEntity1.getMemberEntity().getMemberId()).get();
+            LoginTokenSaveDto tokenSaveDto = LoginTokenSaveDto.builder()
+                    .id(memberEntity.getMemberId())
+                    .email(memberEntity.getMemberEmail())
+                    .memberNickName(memberEntity.getMemberNickname())
+                    .memberRole(memberEntity.getMemberRole())
+                    .build();
+            TokenDto newCreatedToken = tokenProvider.createToken(memberEntity.getMemberId(), tokenSaveDto);
+            RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
+                    .refreshToken(newCreatedToken.getRefreshToken())
+                    .memberEntity(memberEntity)
+                    .build();
+            refreshTokenRepository.save(refreshTokenEntity);
+            TokenRequestDto tokenRequestDto = TokenRequestDto.builder()
+                    .memberNickName(memberEntity.getMemberNickname())
+                    .accessToken(newCreatedToken.getAccessToken())
+                    .accessTokenExpireDate(newCreatedToken.getAccessTokenExpireDate())
+                    .issuedAt(newCreatedToken.getIssuedAt())
+                    .build();
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", newCreatedToken.getRefreshToken())
+                    .maxAge(7 * 24 * 60 * 60)
+                    .path("/")
+                    .secure(true)
+                    .sameSite("None")
+                    .httpOnly(true)
+                    .build();
+            return ResponseEntity.status(200).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(tokenRequestDto);
+        }
+
     }
 }
