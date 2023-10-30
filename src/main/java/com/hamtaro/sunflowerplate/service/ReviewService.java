@@ -93,7 +93,7 @@ public class ReviewService {
         amazonS3Client.deleteObject(bucketName, fileName);
     }
 
-    private File resizeImage(MultipartFile originalImage) throws IOException{
+    private File resizeImage(MultipartFile originalImage) throws IOException {
         File resizeFile = new File("resized_" + originalImage.getOriginalFilename());
         Thumbnails.of(originalImage.getInputStream())
                 .size(400, 400)
