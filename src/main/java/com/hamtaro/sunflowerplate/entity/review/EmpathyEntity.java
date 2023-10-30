@@ -14,12 +14,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = " update empathy set empathy_state = true WHERE empathy_id = ? ")
 @Table(name = "empathy")
-public class EmpathyEntity  {
-//좋아요
+public class EmpathyEntity {
+    //좋아요
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "empathy_id" )
+    @Column(name = "empathy_id")
     private Long empathyId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,4 +31,19 @@ public class EmpathyEntity  {
     @JoinColumn(name = "review_id")
     private ReviewEntity reviewEntity;
 
+    @Column(name = "empathy_state")
+    private Boolean empathyState ;
+
+//    좋아요 취소 false 좋아요 true
+    public void recoverLike(EmpathyEntity empathyEntity) {
+        this.empathyState = null;
+    }
+
+    public static EmpathyEntity toEntity(MemberEntity memberEntity, ReviewEntity reviewEntity) {
+        EmpathyEntity empathyEntity = new EmpathyEntity();
+        empathyEntity.setMemberEntity(memberEntity);
+        empathyEntity.setReviewEntity(reviewEntity);
+
+        return empathyEntity;
+    }
 }

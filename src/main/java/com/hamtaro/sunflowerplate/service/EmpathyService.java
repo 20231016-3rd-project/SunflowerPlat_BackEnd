@@ -1,6 +1,7 @@
 package com.hamtaro.sunflowerplate.service;
 
 
+import com.amazonaws.Response;
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.hamtaro.sunflowerplate.dto.EmpathyDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
@@ -10,15 +11,17 @@ import com.hamtaro.sunflowerplate.repository.EmpathyRepository;
 import com.hamtaro.sunflowerplate.repository.ReviewRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 
-@Log4j2
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmpathyService {
@@ -29,9 +32,7 @@ public class EmpathyService {
 
 
     @Transactional
-    public EmpathyDto countPlus(Long reviewId, String userId) {
-
-
+    public ResponseEntity<?> countPlus(Long reviewId, String userId) {
 
         MemberEntity memberEntity = memberRepository.findById(Long.valueOf(userId))
                 .orElseThrow(() -> new NotFoundException("Could not found user id : "
@@ -41,36 +42,41 @@ public class EmpathyService {
                 .orElseThrow(() -> new NotFoundException("Could not found review id : "
                         + reviewRepository.findById(reviewId)));
 
-        EmpathyDto empathyResponse = new EmpathyDto();
+        HashMap<Object, Object> empathy = new HashMap<>();
+
+
+        Optional<EmpathyEntity> findEmpathy = empathyRepository.findByMemberEntityAndReviewEntity(memberEntity, reviewEntity);
 
         // memberEntity가 reviewEntity를 이미 좋아요한 경우 좋아요를 다시 누르면 좋아요가 취소.
-        int likeCount = empathyRepository.countByReviewEntity(reviewEntity);
+        int empathyCount;
+        boolean empathyButton;
 
-        if (memberEntity.getEmpathyEntityList().stream()
-                .anyMatch(empathyEntity -> empathyEntity.getMemberEntity().equals(memberEntity))){
-
-
-            empathyRepository.deleteByMemberEntityAndReviewEntity(memberEntity, reviewEntity);
-
-            likeCount--;
-            empathyResponse.setMessage("좋아요 취소");
-
-
+        if (findEmpathy.isPresent()) {
+            Boolean empathyState = findEmpathy.get().getEmpathyState();
+            findEmpathy.get().setEmpathyState(!empathyState);
+            empathyRepository.save(findEmpathy.get());
+            empathyButton = !empathyState;
         } else {
-            empathyRepository.save(EmpathyEntity.builder()
+            EmpathyEntity empathyEntity = EmpathyEntity.builder()
                     .reviewEntity(reviewEntity)
                     .memberEntity(memberEntity)
-                    .build());
-
-            likeCount++;
-            empathyResponse.setMessage("좋아요 성공");
+                    .empathyState(true)
+                    .build();
+            empathyRepository.save(empathyEntity);
+            empathyButton = true;
 
 
         }
 
-        empathyResponse.setCount(likeCount);
-        return empathyResponse;
+        empathyCount = empathyRepository.countByReviewEntity(reviewEntity);
+
+        empathy.put("좋아요", empathyButton);
+        empathy.put("좋아요 개수", empathyCount);
+
+        return ResponseEntity.status(200).body(empathy);
     }
 }
+
+
 
 

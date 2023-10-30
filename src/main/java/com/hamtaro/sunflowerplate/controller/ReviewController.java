@@ -1,20 +1,21 @@
 package com.hamtaro.sunflowerplate.controller;
 
-import com.amazonaws.Response;
-import com.hamtaro.sunflowerplate.dto.*;
+import com.hamtaro.sunflowerplate.dto.EmpathyDto;
+import com.hamtaro.sunflowerplate.dto.ReportDto;
+import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
+import com.hamtaro.sunflowerplate.dto.ReviewSaveDto;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
+
 import com.hamtaro.sunflowerplate.service.EmpathyService;
 import com.hamtaro.sunflowerplate.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-
 import java.util.Map;
 
 @Log4j2
@@ -30,13 +31,13 @@ public class ReviewController {
 
     //유저 레스토랑 정보 신고 및 수정
     @PostMapping("/restaurant/edit")
-    public ResponseEntity<Map<String,String>> requestRestaurant(HttpServletRequest request,
-                                                                @RequestBody RequestUpdateDto requestUpdateDto){
+    public ResponseEntity<Map<String, String>> requestRestaurant(HttpServletRequest request,
+                                                                 @RequestBody RequestUpdateDto requestUpdateDto) {
 
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
 
-        return reviewService.requestRestaurant(requestUpdateDto,userId);
+        return reviewService.requestRestaurant(requestUpdateDto, userId);
     }
 
 
@@ -44,32 +45,31 @@ public class ReviewController {
     @PostMapping("/review/new")
     public ResponseEntity<?> createReview(@RequestPart("reviewSaveDto") ReviewSaveDto reviewSaveDto,
                                           @RequestPart("imageFile") List<MultipartFile> imageFile,
-                                          @RequestParam Long restaurantId, HttpServletRequest request){
+                                          @RequestParam Long restaurantId, HttpServletRequest request) {
 
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
-        return reviewService.saveUserReview(reviewSaveDto,imageFile, restaurantId, userId);
+        return reviewService.saveUserReview(reviewSaveDto, imageFile, restaurantId, userId);
     }
 
     //리뷰 신고하기
     @PostMapping("/report")
-    public ResponseEntity<?> alertReview(@RequestBody ReportDto reportDto, HttpServletRequest request){
+    public ResponseEntity<?> alertReview(@RequestBody ReportDto reportDto, HttpServletRequest request) {
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
 
-        return reviewService.reportReview(reportDto,userId);
+        return reviewService.reportReview(reportDto, userId);
     }
 
     //좋아요기능
     @PostMapping("/{reviewId}/like")
-    public ResponseEntity<EmpathyDto> like(@PathVariable Long reviewId , HttpServletRequest request){
+    public ResponseEntity<?> like(@PathVariable Long reviewId, HttpServletRequest request) {
 
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
-        
-        EmpathyDto empathyDto = empathyService.countPlus(reviewId, userId);
 
-        return ResponseEntity.ok(empathyDto);
+
+        return empathyService.countPlus(reviewId,userId);
 
     }
 }
