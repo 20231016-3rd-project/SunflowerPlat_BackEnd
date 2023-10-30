@@ -26,7 +26,7 @@ public class RestaurantController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<RestaurantDto>> findRestaurantList (
-            @RequestParam String keyword,
+            @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "rateDesc") String sort,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String district,

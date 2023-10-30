@@ -48,7 +48,6 @@ public class RestaurantService {
             RestaurantEntity restaurantEntity = restaurantEntityOptional.get();
 
             List<RestaurantMenuDto> restaurantMenuDtoList = new ArrayList<>();
-
             for (RestaurantMenuEntity restaurantMenuEntity : restaurantEntity.getRestaurantMenuEntity()) {
                 RestaurantMenuDto restaurantMenuDto = RestaurantMenuDto
                         .builder()
@@ -129,9 +128,20 @@ public class RestaurantService {
             } else { // 키워드 검색
                 restaurantEntityPage = restaurantRepository.findByRate(pageable,keyword);
             }
+        } else if (sort.equals("like")) { // 좋아요 순 정렬
+            pageable = PageRequest.of(page,10);
+            if(dong != null){ // 동 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable,keyword,dong);
+            } else if (district != null) { // 구 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(pageable,keyword,district);
+            } else if (city != null) { // 시 이름 + 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(pageable, keyword, city);
+            } else { // 키워드 검색
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndLikeCountEntity_likeStatus(pageable,keyword);
+            }
         } else {
-            String properties = sort.equals("like") ? "likeCountEntityList.size" : "reviewEntityList.size";
-            pageable = PageRequest.of(page,10, Sort.by(Sort.Direction.DESC, properties));
+//            String properties = sort.equals("like") ? "likeCountEntityList.size" : "reviewEntityList.size";
+            pageable = PageRequest.of(page,10, Sort.by(Sort.Direction.DESC, "reviewEntityList.size"));
 
             if(dong != null){ // 동 이름 + 키워드 검색
                 restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable,keyword,dong);
@@ -167,7 +177,7 @@ public class RestaurantService {
                 .restaurantName(restaurantEntity.getRestaurantName())
                 .restaurantAddress(restaurantEntity.getRestaurantAddress())
                 .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
-                .likeCount(restaurantEntity.getLikeCountEntityList().size())
+                .likeCount(likeCountRepository.countByRestaurantEntity_RestaurantId(restaurantEntity.getRestaurantId()))
                 .reviewCount(restaurantEntity.getReviewEntityList().size())
                 .avgStarRate(restaurantRepository.findStarRateByRestaurantId(restaurantEntity.getRestaurantId()))
                 .build();

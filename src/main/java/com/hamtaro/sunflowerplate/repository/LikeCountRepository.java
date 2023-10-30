@@ -11,6 +11,7 @@ public interface LikeCountRepository extends JpaRepository<LikeCountEntity,Long>
     @Query("SELECT l FROM LikeCountEntity l WHERE l.memberEntity.memberId = :memberId And l.restaurantEntity.restaurantId = :restaurantId")
     Optional<LikeCountEntity> findByMemberEntityAndRestaurantEntity(@Param("memberId") Long memberId, @Param("restaurantId") Long restaurantId);
 
+    @Query("SELECT count(l) FROM LikeCountEntity l WHERE l.restaurantEntity.restaurantId = :restaurantId AND l.likeStatus = true")
     int countByRestaurantEntity_RestaurantId(Long restaurantId);
 
 }
