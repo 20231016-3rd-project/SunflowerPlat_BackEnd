@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.repository;
+package com.hamtaro.sunflowerplate.repository.restaurant;
 
 import com.hamtaro.sunflowerplate.entity.address.DongEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

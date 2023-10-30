@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.service;
+package com.hamtaro.sunflowerplate.service.restaurant;
 
 import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuUpdateDto;
 import com.hamtaro.sunflowerplate.dto.admin.RestaurantSaveDto;
@@ -9,10 +9,10 @@ import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.entity.address.DongEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantMenuEntity;
-import com.hamtaro.sunflowerplate.repository.DongRepository;
-import com.hamtaro.sunflowerplate.repository.LikeCountRepository;
-import com.hamtaro.sunflowerplate.repository.RestaurantMenuRepository;
-import com.hamtaro.sunflowerplate.repository.RestaurantRepository;
+import com.hamtaro.sunflowerplate.repository.restaurant.DongRepository;
+import com.hamtaro.sunflowerplate.repository.restaurant.LikeCountRepository;
+import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantMenuRepository;
+import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -35,6 +37,7 @@ public class RestaurantService {
     private final RestaurantMenuRepository restaurantMenuRepository;
     private final LikeCountRepository likeCountRepository;
     private final MemberRepository memberRepository;
+    private final ImageService imageService;
 
     // 이미지 S3 추가 필요
 
@@ -72,8 +75,9 @@ public class RestaurantService {
     }
 
     // 식당 정보 저장
-    public ResponseEntity<?> saveRestaurant(RestaurantSaveDto restaurantSaveDto) {
+    public ResponseEntity<?> saveRestaurant(RestaurantSaveDto restaurantSaveDto, List<MultipartFile> multipartFilelist) throws IOException {
 
+        // 동엔티티 설정
         DongEntity dong = dongRepository.findByDongName(restaurantSaveDto.getRestaurantAdministrativeDistrict().getDongName()).get();
 
         RestaurantEntity restaurantEntity = RestaurantEntity.builder()
@@ -102,6 +106,11 @@ public class RestaurantService {
         }
 
         restaurantMenuRepository.saveAll(restaurantMenuEntityList);
+
+        if(multipartFilelist != null) {
+            imageService.upload(multipartFilelist, restaurantEntity);
+        }
+
 
         if (restaurantRepository.findById(restaurantId).isEmpty()) {
             return ResponseEntity.status(400).body("식당 등록에 실패하였습니다.");

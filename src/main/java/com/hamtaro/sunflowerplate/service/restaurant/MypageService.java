@@ -1,9 +1,8 @@
-package com.hamtaro.sunflowerplate.service;
+package com.hamtaro.sunflowerplate.service.restaurant;
 
-import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.review.LikeCountEntity;
-import com.hamtaro.sunflowerplate.repository.LikeCountRepository;
-import com.hamtaro.sunflowerplate.repository.RestaurantRepository;
+import com.hamtaro.sunflowerplate.repository.restaurant.LikeCountRepository;
+import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

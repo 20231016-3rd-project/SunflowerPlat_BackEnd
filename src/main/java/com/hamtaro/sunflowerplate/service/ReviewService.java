@@ -14,6 +14,7 @@ import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewImageEntity;
 import com.hamtaro.sunflowerplate.repository.*;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
+import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;

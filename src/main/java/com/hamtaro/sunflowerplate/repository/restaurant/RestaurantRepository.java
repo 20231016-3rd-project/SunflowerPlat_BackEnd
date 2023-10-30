@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.repository;
+package com.hamtaro.sunflowerplate.repository.restaurant;
 
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import org.springframework.data.domain.Page;

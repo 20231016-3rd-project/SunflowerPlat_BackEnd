@@ -5,11 +5,15 @@ import com.hamtaro.sunflowerplate.dto.ReportDto;
 import com.hamtaro.sunflowerplate.dto.admin.RestaurantSaveDto;
 import com.hamtaro.sunflowerplate.dto.admin.UpdateRestaurantInfoDto;
 import com.hamtaro.sunflowerplate.service.AdminService;
-import com.hamtaro.sunflowerplate.service.RestaurantService;
+import com.hamtaro.sunflowerplate.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -34,8 +38,9 @@ public class AdminController {
     }
 
     @PostMapping( consumes = {"multipart/form-data"}, value="/restaurant/registration")
-    public ResponseEntity<?> saveRestaurantInfo(@RequestPart(value = "data") RestaurantSaveDto restaurantSaveDto){
-        return restaurantService.saveRestaurant(restaurantSaveDto);
+    public ResponseEntity<?> saveRestaurantInfo(@RequestPart(value = "data") RestaurantSaveDto restaurantSaveDto,
+                                                @RequestPart(name = "file") List<MultipartFile> multipartFilelist) throws IOException {
+        return restaurantService.saveRestaurant(restaurantSaveDto, multipartFilelist);
     }
 
     @PutMapping(consumes = {"multipart/form-data"}, value = "/restaurant/{restaurantId}")

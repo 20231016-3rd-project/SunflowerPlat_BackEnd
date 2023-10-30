@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.repository;
+package com.hamtaro.sunflowerplate.repository.restaurant;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
