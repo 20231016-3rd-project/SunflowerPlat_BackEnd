@@ -105,7 +105,7 @@ public class ReviewService {
     public ResponseEntity<Map<String,String>> saveUserReview(ReviewSaveDto reviewSaveDto, List<MultipartFile> imageFile, Long restaurantId, String userId){
 
         RestaurantEntity restaurantEntity = restaurantRepository.findByRestaurantId(restaurantId).get();
-        MemberEntity memberEntity = (memberRepository.findById(Long.valueOf(userId))).get();
+        MemberEntity memberEntity = memberRepository.findById(Long.valueOf(userId)).get();
         ReviewEntity reviewSaveEntity = ReviewEntity.builder()
                 .reviewContent(reviewSaveDto.getReviewContent())
                 .reviewStarRating(reviewSaveDto.getReviewStarRating())
@@ -113,8 +113,8 @@ public class ReviewService {
                 .memberEntity(memberEntity)
                 .restaurantEntity(restaurantEntity)
                 .build();
-        ReviewEntity reviewEntity = reviewRepository.save(reviewSaveEntity);
-        Long reviewId = reviewEntity.getReviewId();
+        Long reviewId = reviewRepository.save(reviewSaveEntity).getReviewId();
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewId).get();
 
         for (MultipartFile multipartFile: imageFile){
 
@@ -195,7 +195,5 @@ public class ReviewService {
                 map.put("message","신고가 접수되지 않았습니다.");
                 return ResponseEntity.status(400).body(map);
             }
-
     }
-
 }
