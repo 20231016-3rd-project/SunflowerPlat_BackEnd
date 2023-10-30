@@ -10,8 +10,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewSaveDto {
-    private Long restaurantId;
+public class ReviewReturnDto {
 
     private Long memberId;
 
@@ -21,4 +20,5 @@ public class ReviewSaveDto {
 
     private LocalDate reviewAt;
 
+    private List<ReviewImageDto> reviewImageDtoList;
 }

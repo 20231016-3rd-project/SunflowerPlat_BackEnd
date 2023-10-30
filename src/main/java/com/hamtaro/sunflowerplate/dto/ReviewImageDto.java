@@ -10,14 +10,16 @@ import lombok.*;
 public class ReviewImageDto {
 
     private Long reviewImageId;
-
-    private Long reviewId;
-
-    private Long restaurantId;
-
+//
+//    private Long reviewId;
+//
+//    private Long restaurantId;
+//
     private String reviewOriginName;
 
     private String reviewStoredName;
+
+    private String reviewResizeStoredName;
 
     private String reviewOriginUrl;
 

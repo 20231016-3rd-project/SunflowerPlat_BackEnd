@@ -42,7 +42,7 @@ public class ReviewController {
 
 
     //리뷰 작성 후 저장
-    @PostMapping("/review/new")
+    @PostMapping(consumes = {"multipart/form-data"}, value="/review/new")
     public ResponseEntity<?> createReview(@RequestPart("reviewSaveDto") ReviewSaveDto reviewSaveDto,
                                           @RequestPart("imageFile") List<MultipartFile> imageFile,
                                           @RequestParam Long restaurantId, HttpServletRequest request) {
