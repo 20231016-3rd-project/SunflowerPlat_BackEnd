@@ -19,44 +19,45 @@ import java.util.List;
 @Table(name = "restaurant")
 public class RestaurantEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "restaurant_id")
     private Long restaurantId;
 
-    @Column(name = "restaurant_name")
+    @Column(name = "restaurant_name", nullable = false, length = 20)
     private String restaurantName;
 
-    @Column(name = "restaurant_tel_num")
+    @Column(name = "restaurant_tel_num", length = 13)
     private String restaurantTelNum;
 
-    @Column(name = "restaurant_address")
+    @Column(name = "restaurant_address", nullable = false, length = 20)
     private String restaurantAddress;
 
-    @Column(name = "restaurant_open_time")
+    @Column(name = "restaurant_open_time", nullable = false, length = 30)
     private String restaurantOpenTime;
 
-    @Column(name = "restaurant_break_time")
+    @Column(name = "restaurant_break_time", length = 30)
     private String restaurantBreakTime;
 
-    @Column(name = "restaurant_web_site")
+    @Column(name = "restaurant_web_site", length = 100)
     private String restaurantWebSite;
 
-    @Column(name = "restaurant_status" )
+    @Column(name = "restaurant_status", length = 10)
     private String restaurantStatus;
 
-    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RestaurantImageEntity> restaurantImageEntity = new ArrayList<>();
 
-    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RestaurantMenuEntity> restaurantMenuEntity = new ArrayList<>();
 
-    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<LikeCountEntity> likeCountEntityList;
 
-    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RequestEntity> requestEntityList;
 
-    @OneToMany(mappedBy = "restaurantEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurantEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ReviewEntity> reviewEntityList;
 
     @ManyToOne

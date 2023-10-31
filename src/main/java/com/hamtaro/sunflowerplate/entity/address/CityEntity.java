@@ -19,7 +19,7 @@ public class CityEntity {
     @Column(name = "city_id")
     private Long cityId;
 
-    @Column(name = "city_name")
+    @Column(name = "city_name", length = 10)
     private String cityName;
 
     @OneToMany(mappedBy = "cityEntity", cascade = CascadeType.ALL)

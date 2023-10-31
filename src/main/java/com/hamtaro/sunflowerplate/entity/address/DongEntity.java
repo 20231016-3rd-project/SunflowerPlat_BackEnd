@@ -20,7 +20,7 @@ public class DongEntity {
     @Column(name = "dong_id")
     private Long dongId;
 
-    @Column(name = "dong_name")
+    @Column(name = "dong_name", length = 10)
     private String dongName;
 
     @ManyToOne

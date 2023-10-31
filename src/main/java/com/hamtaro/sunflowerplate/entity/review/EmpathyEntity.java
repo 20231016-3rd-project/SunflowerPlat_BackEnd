@@ -4,7 +4,6 @@ package com.hamtaro.sunflowerplate.entity.review;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -32,12 +31,7 @@ public class EmpathyEntity {
     private ReviewEntity reviewEntity;
 
     @Column(name = "empathy_state")
-    private Boolean empathyState ;
-
-//    좋아요 취소 false 좋아요 true
-    public void recoverLike(EmpathyEntity empathyEntity) {
-        this.empathyState = null;
-    }
+    private Boolean empathyState;
 
     public static EmpathyEntity toEntity(MemberEntity memberEntity, ReviewEntity reviewEntity) {
         EmpathyEntity empathyEntity = new EmpathyEntity();
@@ -45,5 +39,10 @@ public class EmpathyEntity {
         empathyEntity.setReviewEntity(reviewEntity);
 
         return empathyEntity;
+    }
+
+    //    좋아요 취소 false 좋아요 true
+    public void recoverLike(EmpathyEntity empathyEntity) {
+        this.empathyState = null;
     }
 }
