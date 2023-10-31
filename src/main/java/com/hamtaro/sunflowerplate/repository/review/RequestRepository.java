@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.repository;
+package com.hamtaro.sunflowerplate.repository.review;
 
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;

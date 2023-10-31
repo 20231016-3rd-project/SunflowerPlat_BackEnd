@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.dto;
+package com.hamtaro.sunflowerplate.dto.review;
 
 import lombok.*;
 

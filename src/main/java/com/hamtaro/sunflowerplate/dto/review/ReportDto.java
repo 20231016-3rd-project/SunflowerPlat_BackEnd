@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.dto;
+package com.hamtaro.sunflowerplate.dto.review;
 
 import lombok.*;
 
@@ -9,25 +9,15 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminReportDto {
+public class ReportDto {
 
     private Long reviewId;
 
     private Long memberId;
-
-    private String nickName;
-
-    private String reviewAuthor;
-
-    private String reviewProfilePicture;
-
-    private String memberProfilePicture;
 
     private String reportCategory;
 
     private String reportContent;
 
     private LocalDate reportAt;
-
-
 }

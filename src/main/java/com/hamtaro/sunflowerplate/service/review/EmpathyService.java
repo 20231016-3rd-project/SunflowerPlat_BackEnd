@@ -1,14 +1,12 @@
-package com.hamtaro.sunflowerplate.service;
+package com.hamtaro.sunflowerplate.service.review;
 
 
-import com.amazonaws.Response;
 import com.amazonaws.services.kms.model.NotFoundException;
-import com.hamtaro.sunflowerplate.dto.EmpathyDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.review.EmpathyEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
-import com.hamtaro.sunflowerplate.repository.EmpathyRepository;
-import com.hamtaro.sunflowerplate.repository.ReviewRepository;
+import com.hamtaro.sunflowerplate.repository.review.EmpathyRepository;
+import com.hamtaro.sunflowerplate.repository.review.ReviewRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 

@@ -1,13 +1,12 @@
-package com.hamtaro.sunflowerplate.controller;
+package com.hamtaro.sunflowerplate.controller.review;
 
-import com.hamtaro.sunflowerplate.dto.EmpathyDto;
-import com.hamtaro.sunflowerplate.dto.ReportDto;
-import com.hamtaro.sunflowerplate.dto.RequestUpdateDto;
-import com.hamtaro.sunflowerplate.dto.ReviewSaveDto;
+import com.hamtaro.sunflowerplate.dto.review.ReportDto;
+import com.hamtaro.sunflowerplate.dto.review.RequestUpdateDto;
+import com.hamtaro.sunflowerplate.dto.review.ReviewSaveDto;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 
-import com.hamtaro.sunflowerplate.service.EmpathyService;
-import com.hamtaro.sunflowerplate.service.ReviewService;
+import com.hamtaro.sunflowerplate.service.review.EmpathyService;
+import com.hamtaro.sunflowerplate.service.review.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;

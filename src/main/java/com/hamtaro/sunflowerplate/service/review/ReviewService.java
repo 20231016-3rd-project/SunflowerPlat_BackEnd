@@ -1,18 +1,21 @@
-package com.hamtaro.sunflowerplate.service;
+package com.hamtaro.sunflowerplate.service.review;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.hamtaro.sunflowerplate.dto.*;
+import com.hamtaro.sunflowerplate.dto.review.*;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewImageEntity;
-import com.hamtaro.sunflowerplate.repository.*;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantRepository;
+import com.hamtaro.sunflowerplate.repository.review.ReportRepository;
+import com.hamtaro.sunflowerplate.repository.review.RequestRepository;
+import com.hamtaro.sunflowerplate.repository.review.ReviewImageRepository;
+import com.hamtaro.sunflowerplate.repository.review.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnails;

@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.dto;
+package com.hamtaro.sunflowerplate.dto.review;
 
 import lombok.*;
 
@@ -10,7 +10,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewReturnDto {
+public class ReviewSaveDto {
+    private Long restaurantId;
 
     private Long memberId;
 
@@ -20,5 +21,4 @@ public class ReviewReturnDto {
 
     private LocalDate reviewAt;
 
-    private List<ReviewImageDto> reviewImageDtoList;
 }
