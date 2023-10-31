@@ -27,7 +27,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/sunflowerPlate/user")
 @Tag(name = "회원가입", description = "회원가입관련 API")
 public class MemberController {
     private final MemberService memberService;
