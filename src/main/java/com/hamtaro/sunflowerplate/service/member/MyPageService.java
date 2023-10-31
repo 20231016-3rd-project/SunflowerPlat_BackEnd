@@ -3,8 +3,8 @@ package com.hamtaro.sunflowerplate.service.member;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.hamtaro.sunflowerplate.dto.member.RequestMyPlaceDto;
-import com.hamtaro.sunflowerplate.dto.member.RequestMyReviewDto;
+import com.hamtaro.sunflowerplate.dto.member.MyPlaceDto;
+import com.hamtaro.sunflowerplate.dto.member.MyReviewDto;
 import com.hamtaro.sunflowerplate.dto.member.UpdateReviewDto;
 import com.hamtaro.sunflowerplate.dto.member.UpdateReviewImageDto;
 import com.hamtaro.sunflowerplate.dto.review.ReviewImageDto;
@@ -51,7 +51,7 @@ public class MyPageService {
     public ResponseEntity<?> getMyReview(String userId) {
         MemberEntity findId = memberRepository.findById(Long.valueOf(userId)).get();
         List<ReviewEntity> myReview = reviewRepository.findByMemberEntity_MemberId(findId.getMemberId());
-        List<RequestMyReviewDto> requestMyReviewDtoList = new ArrayList<>();
+        List<MyReviewDto> myReviewDtoList = new ArrayList<>();
         for (ReviewEntity reviewEntity : myReview) {
             List<ReviewImageDto> reviewImageDtoList = new ArrayList<>();
 
@@ -66,18 +66,18 @@ public class MyPageService {
                                       .build();
                 reviewImageDtoList.add(reviewImageDto);
             }
-            RequestMyReviewDto requestMyReviewDto =
-                    RequestMyReviewDto.builder()
-                                      .restaurantId(reviewEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
-                                      .restaurantName(reviewEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
-                                      .reviewContent(reviewEntity.getReviewContent()) //리뷰내용
-                                      .reviewStarRating(reviewEntity.getReviewStarRating()) //리뷰별점
-                                      .reviewImageDto(reviewImageDtoList)
-                                      .reviewAt(reviewEntity.getReviewAt()) // 리뷰작성시간
-                                      .build();
-            requestMyReviewDtoList.add(requestMyReviewDto);
+            MyReviewDto myReviewDto =
+                    MyReviewDto.builder()
+                               .restaurantId(reviewEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
+                               .restaurantName(reviewEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
+                               .reviewContent(reviewEntity.getReviewContent()) //리뷰내용
+                               .reviewStarRating(reviewEntity.getReviewStarRating()) //리뷰별점
+                               .reviewImageDto(reviewImageDtoList)
+                               .reviewAt(reviewEntity.getReviewAt()) // 리뷰작성시간
+                               .build();
+            myReviewDtoList.add(myReviewDto);
         }
-        return ResponseEntity.status(200).body(requestMyReviewDtoList);
+        return ResponseEntity.status(200).body(myReviewDtoList);
     }
 
     public ResponseEntity<?> deleteMyReview(Long reviewId, String userId) {
@@ -270,16 +270,16 @@ public class MyPageService {
             reviewImageDtoList.add(reviewImageDto);
         }
 
-        RequestMyReviewDto requestMyReviewDto =
-                RequestMyReviewDto.builder()
-                                  .restaurantId(responseEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
-                                  .restaurantName(responseEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
-                                  .reviewContent(responseEntity.getReviewContent()) //리뷰내용
-                                  .reviewStarRating(responseEntity.getReviewStarRating()) //리뷰별점
-                                  .reviewImageDto(reviewImageDtoList)
-                                  .reviewAt(responseEntity.getReviewAt()) // 리뷰작성시간
-                                  .build();
-        return ResponseEntity.status(200).body(requestMyReviewDto);
+        MyReviewDto myReviewDto =
+                MyReviewDto.builder()
+                           .restaurantId(responseEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
+                           .restaurantName(responseEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
+                           .reviewContent(responseEntity.getReviewContent()) //리뷰내용
+                           .reviewStarRating(responseEntity.getReviewStarRating()) //리뷰별점
+                           .reviewImageDto(reviewImageDtoList)
+                           .reviewAt(responseEntity.getReviewAt()) // 리뷰작성시간
+                           .build();
+        return ResponseEntity.status(200).body(myReviewDto);
 
     }
 
@@ -287,25 +287,25 @@ public class MyPageService {
     public ResponseEntity<?> getMyPlace(String userId) {
         MemberEntity findId = memberRepository.findById(Long.valueOf(userId)).get();
         List<LikeCountEntity> myPlace = likeCountRepository.findByMemberEntity_MemberId(findId.getMemberId());
-        List<RequestMyPlaceDto> requestMyPlaceDtoList = new ArrayList<>();
+        List<MyPlaceDto> myPlaceDtoList = new ArrayList<>();
         for (LikeCountEntity likeCountEntity : myPlace) {
-            RequestMyPlaceDto requestMyPlaceDto = RequestMyPlaceDto.builder()
-                                                                   .restaurantId(likeCountEntity.getRestaurantEntity()
+            MyPlaceDto myPlaceDto = MyPlaceDto.builder()
+                                              .restaurantId(likeCountEntity.getRestaurantEntity()
                                                                                                 .getRestaurantId())
-                                                                   .restaurantName(likeCountEntity.getRestaurantEntity()
+                                              .restaurantName(likeCountEntity.getRestaurantEntity()
                                                                                                   .getRestaurantName())
-                                                                   .restaurantAddress(likeCountEntity.getRestaurantEntity()
+                                              .restaurantAddress(likeCountEntity.getRestaurantEntity()
                                                                                                      .getRestaurantAddress())
-                                                                   .restaurantWebSite(likeCountEntity.getRestaurantEntity()
+                                              .restaurantWebSite(likeCountEntity.getRestaurantEntity()
                                                                                                      .getRestaurantWebSite())
-                                                                   .resizeImgUrl(likeCountEntity.getRestaurantEntity()
+                                              .resizeImgUrl(likeCountEntity.getRestaurantEntity()
                                                                                                 .getRestaurantImageEntity()
                                                                                                 .get(0)
                                                                                                 .getRestaurantResizeUrl())
-                                                                   .build();
-            requestMyPlaceDtoList.add(requestMyPlaceDto);
+                                              .build();
+            myPlaceDtoList.add(myPlaceDto);
         }
-        return ResponseEntity.status(200).body(requestMyPlaceDtoList);
+        return ResponseEntity.status(200).body(myPlaceDtoList);
     }
 
     public ResponseEntity<?> clickLikeButton(Long restaurantId, String userId) {
