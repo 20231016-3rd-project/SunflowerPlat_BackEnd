@@ -14,6 +14,7 @@ public class RestaurantSaveDto {
     private String restaurantOpenTime;
     private String restaurantBreakTime;
     private String restaurantWebSite;
+    private String restaurantStatus;
     private List<RestaurantMenuDto> restaurantMenuDtoList;
 //    private List<RestaurantImageDto> restaurantImageDtoList;
 

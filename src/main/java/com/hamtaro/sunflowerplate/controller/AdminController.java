@@ -45,8 +45,9 @@ public class AdminController {
 
     @PutMapping(consumes = {"multipart/form-data"}, value = "/restaurant/{restaurantId}")
     public ResponseEntity<?> updateRestaurantInfo(@PathVariable Long restaurantId ,
-                                                  @RequestPart(value = "data") UpdateRestaurantInfoDto restaurantDto){
-        return restaurantService.updateRestaurantInfo(restaurantId, restaurantDto);
+                                                  @RequestPart(value = "data") UpdateRestaurantInfoDto restaurantDto,
+                                                  @RequestPart(name = "file") List<MultipartFile> multipartFilelist) throws IOException {
+        return restaurantService.updateRestaurantInfo(restaurantId, restaurantDto, multipartFilelist);
     }
 
 

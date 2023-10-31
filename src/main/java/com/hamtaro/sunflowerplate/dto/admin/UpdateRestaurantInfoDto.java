@@ -15,6 +15,7 @@ public class UpdateRestaurantInfoDto {
     private String restaurantOpenTime;
     private String restaurantBreakTime;
     private String restaurantWebSite;
+    private String restaurantStatus;
     private List<RestaurantMenuUpdateDto> restaurantMenuDtoList;
     private RestaurantAdministrativeDistrict restaurantAdministrativeDistrict;
 }

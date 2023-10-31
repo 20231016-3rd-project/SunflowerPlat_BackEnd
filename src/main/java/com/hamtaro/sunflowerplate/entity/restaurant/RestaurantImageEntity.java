@@ -24,6 +24,9 @@ public class RestaurantImageEntity {
     @Column(name="restaurant_stored_name")
     private String restaurantStoredName; //S3 저장 이름
 
+    @Column(name="restaurant_resized_stored_name")
+    private String restaurantResizedStoredName; //S3 저장 이름
+
     @Column(name = "restaurant_origin_url")
     private String restaurantOriginUrl; //원본사진 URL
 

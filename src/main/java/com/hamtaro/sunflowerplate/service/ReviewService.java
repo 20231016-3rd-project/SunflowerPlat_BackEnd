@@ -87,7 +87,7 @@ public class ReviewService {
 
     //이미지 파일
     private final AmazonS3Client amazonS3Client;
-    @Value("${cloud.aws.s3.bucket}")
+    @Value("${cloud.aws.s3.review-img}")
     private String bucketName;
 
     private String createFileName(String fileName) {
