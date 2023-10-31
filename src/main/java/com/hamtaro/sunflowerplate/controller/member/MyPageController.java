@@ -6,8 +6,12 @@ import com.hamtaro.sunflowerplate.service.member.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,8 +36,19 @@ public class MyPageController {
     }
 
     @PutMapping("/myreview")
-    public ResponseEntity<?> updateMyReview(@RequestParam Long reviewId, @RequestPart UpdateReviewDto updateReviewDto) {
-        return myPageService.updateMyReview(reviewId, updateReviewDto);
+    public ResponseEntity<?> updateMyReview(HttpServletRequest request, @RequestParam Long reviewId, @RequestPart UpdateReviewDto updateReviewDto, @RequestPart List<MultipartFile> imageFile) {
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        Boolean check = myPageService.updateMyReview(reviewId, updateReviewDto, userId, imageFile);
+        if (check) {
+            return myPageService.updateMyReview(reviewId);
+//            return null;
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "권한없음");
+            return ResponseEntity.status(403).body(response);
+
+        }
     }
 
     @GetMapping("/myplace")
