@@ -45,6 +45,6 @@ public class ReviewEntity {
     @OneToMany(mappedBy = "reviewEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<EmpathyEntity> empathyEntityList;
 
-    @OneToMany(mappedBy = "reviewEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reviewEntity",cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private List<ReviewImageEntity> reviewImageEntityList;
 }

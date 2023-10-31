@@ -18,6 +18,8 @@ public class UpdateReviewDto {
 
     private String reviewContent;
 
-    private List<MultipartFile> imageFile;
+    private List<UpdateReviewImageDto> imageDtoList;
+
+
 
 }

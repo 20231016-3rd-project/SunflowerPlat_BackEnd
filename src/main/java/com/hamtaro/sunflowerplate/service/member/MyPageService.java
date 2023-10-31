@@ -3,13 +3,12 @@ package com.hamtaro.sunflowerplate.service.member;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.hamtaro.sunflowerplate.dto.ReviewDto;
 import com.hamtaro.sunflowerplate.dto.ReviewImageDto;
 import com.hamtaro.sunflowerplate.dto.member.RequestMyPlaceDto;
 import com.hamtaro.sunflowerplate.dto.member.RequestMyReviewDto;
 import com.hamtaro.sunflowerplate.dto.member.UpdateReviewDto;
+import com.hamtaro.sunflowerplate.dto.member.UpdateReviewImageDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
-import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantImageEntity;
 import com.hamtaro.sunflowerplate.entity.review.LikeCountEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewImageEntity;
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -121,8 +121,8 @@ public class MyPageService {
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
     }
 
-    // 업데이트 아직 진행중
-    public ResponseEntity<?> updateMyReview(Long reviewId, UpdateReviewDto updateReviewDto) {
+    @Transactional
+    public Boolean updateMyReview(Long reviewId, UpdateReviewDto updateReviewDto, String userId, List<MultipartFile> imageFile) {
         ReviewEntity findReview = reviewRepository.findById(reviewId).get();
         if (findReview.getMemberEntity().getMemberId().equals(Long.valueOf(userId))) {
             for (UpdateReviewImageDto updateReviewImageDto : updateReviewDto.getImageDtoList()) {
@@ -155,17 +155,17 @@ public class MyPageService {
                         objectMetadata.setContentType(multipartFile.getContentType());
                         objectMetadata.setContentLength(multipartFile.getSize());
 
-                //원본 파일 저장
-                String storedName = createFileName(fileName);
-                amazonS3Client.putObject(new PutObjectRequest(bucketName,storedName,multipartFile.getInputStream(),objectMetadata));
-                String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
-                System.out.println("Original Image URL:" + accessUrl);
+                        //원본 파일 저장
+                        String storedName = createFileName(fileName);
+                        amazonS3Client.putObject(new PutObjectRequest(bucketName, storedName, multipartFile.getInputStream(), objectMetadata));
+                        String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
+                        System.out.println("Original Image URL:" + accessUrl);
 
-                //리사이징 파일 저장
-                String resizeName = "resized_" + storedName;
-                File resizedImageFile = resizeImage(multipartFile);
-                amazonS3Client.putObject(bucketName,resizeName,resizedImageFile);
-                String resizeUrl = amazonS3Client.getUrl(bucketName,resizeName).toString();
+                        //리사이징 파일 저장
+                        String resizeName = "resized_" + storedName;
+                        File resizedImageFile = resizeImage(multipartFile);
+                        amazonS3Client.putObject(bucketName, resizeName, resizedImageFile);
+                        String resizeUrl = amazonS3Client.getUrl(bucketName, resizeName).toString();
 
                         //이미지 저장
                         reviewImageRepository.save(ReviewImageEntity.builder()
