@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LikeCountRepository extends JpaRepository<LikeCountEntity,Long> {
@@ -13,5 +14,6 @@ public interface LikeCountRepository extends JpaRepository<LikeCountEntity,Long>
 
     @Query("SELECT count(l) FROM LikeCountEntity l WHERE l.restaurantEntity.restaurantId = :restaurantId AND l.likeStatus = true")
     int countByRestaurantEntity_RestaurantId(Long restaurantId);
+    List<LikeCountEntity> findByMemberEntity_MemberId(Long id);
 
 }
