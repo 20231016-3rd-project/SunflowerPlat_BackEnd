@@ -14,6 +14,7 @@ import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantImageEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantMenuEntity;
 import com.hamtaro.sunflowerplate.repository.restaurant.*;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
+import com.hamtaro.sunflowerplate.service.review.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,9 +38,10 @@ public class RestaurantService {
     private final LikeCountRepository likeCountRepository;
     private final MemberRepository memberRepository;
     private final ImageService imageService;
+    private final ReviewService reviewService;
 
     // 식당 정보 조회 - 리뷰 조회 추가 필요
-    public ResponseEntity<?> findRestaurantDetailsById(Long restaurantId) {
+    public ResponseEntity<?> findRestaurantDetailsById(Long restaurantId, int reviewPage) {
         Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
 
         if (restaurantEntityOptional.isEmpty()) {
@@ -47,6 +49,7 @@ public class RestaurantService {
         } else {
             RestaurantEntity restaurantEntity = restaurantEntityOptional.get();
 
+            // 메뉴 리스트 불러오기
             List<RestaurantMenuDto> restaurantMenuDtoList = new ArrayList<>();
             for (RestaurantMenuEntity restaurantMenuEntity : restaurantEntity.getRestaurantMenuEntity()) {
                 RestaurantMenuDto restaurantMenuDto = RestaurantMenuDto
@@ -57,6 +60,7 @@ public class RestaurantService {
                 restaurantMenuDtoList.add(restaurantMenuDto);
             }
 
+            // 이미지 불러오기
             List<RestaurantImageDto> restaurantImageDtoList = new ArrayList<>();
             for(RestaurantImageEntity restaurantImageEntity : restaurantEntity.getRestaurantImageEntity()){
                 RestaurantImageDto restaurantImageDto = RestaurantImageDto
@@ -70,13 +74,14 @@ public class RestaurantService {
                 restaurantImageDtoList.add(restaurantImageDto);
             }
 
+            // 좋아요 불러오기
             RestaurantLikeCountDto restaurantLikeCountDto = RestaurantLikeCountDto
                     .builder()
                     .restaurantLikeCount(likeCountRepository.countByRestaurantEntity_RestaurantId(restaurantId))
                     .likedRestaurant(false) // 로그인 후 좋아요 여부 체크 기능 필요
                     .build();
 
-
+            // Entity -> Dto 변환
             RestaurantDetailDto restaurantDetailDto = RestaurantDetailDto
                     .builder()
                     .restaurantName(restaurantEntity.getRestaurantName())
@@ -87,59 +92,12 @@ public class RestaurantService {
                     .restaurantLikeCountDto(restaurantLikeCountDto)
                     .restaurantImageDtoList(restaurantImageDtoList)
                     .restaurantMenuDtoList(restaurantMenuDtoList)
+                    .reviewReturnDtoPage(reviewService.findReviewPageByRestaurant(restaurantId,reviewPage))
                     .build();
 
             return ResponseEntity.status(200).body(restaurantDetailDto);
         }
     }
-
-    // 식당 정보 저장
-//    public ResponseEntity<?> saveRestaurant(RestaurantSaveDto restaurantSaveDto, List<MultipartFile> multipartFileList) throws IOException {
-//
-//        // 동엔티티 설정
-//        DongEntity dong = dongRepository.findByDongName(restaurantSaveDto.getRestaurantAdministrativeDistrict().getDongName()).get();
-//
-//        RestaurantEntity restaurantEntity = RestaurantEntity.builder()
-//                .restaurantName(restaurantSaveDto.getRestaurantName())
-//                .restaurantTelNum(restaurantSaveDto.getRestaurantTelNum())
-//                .restaurantAddress(restaurantSaveDto.getRestaurantAddress())
-//                .restaurantOpenTime(restaurantSaveDto.getRestaurantOpenTime())
-//                .restaurantBreakTime(restaurantSaveDto.getRestaurantBreakTime())
-//                .restaurantWebSite(restaurantSaveDto.getRestaurantWebSite())
-//                .restaurantStatus("OPEN")
-//                .dongEntity(dong)
-//                .build();
-//
-//        Long restaurantId = restaurantRepository.save(restaurantEntity).getRestaurantId();
-//
-//        List<RestaurantMenuDto> restaurantMenuDtoList = restaurantSaveDto.getRestaurantMenuDtoList();
-//        List<RestaurantMenuEntity> restaurantMenuEntityList = new ArrayList<>();
-//
-//        for (RestaurantMenuDto restaurantMenuDto : restaurantMenuDtoList) {
-//            RestaurantMenuEntity restaurantMenuEntity = RestaurantMenuEntity
-//                    .builder()
-//                    .restaurantMenuName(restaurantMenuDto.getRestaurantMenuName())
-//                    .restaurantMenuPrice(restaurantMenuDto.getRestaurantMenuPrice())
-//                    .restaurantEntity(restaurantRepository.findByRestaurantId(restaurantId).get())
-//                    .build();
-//            restaurantMenuEntityList.add(restaurantMenuEntity);
-//        }
-//
-//        restaurantMenuRepository.saveAll(restaurantMenuEntityList);
-//
-//        if(multipartFileList != null) {
-//        String dirName = "restaurant" + restaurantId;
-//            imageService.upload(multipartFileList, dirName, restaurantEntity);
-//        }
-//
-//
-//        if (restaurantRepository.findById(restaurantId).isEmpty()) {
-//            return ResponseEntity.status(400).body("식당 등록에 실패하였습니다.");
-//        } else {
-//            return ResponseEntity.status(200).body("식당 등록에 성공하였습니다.");
-//        }
-//
-//    }
 
     // 식당 검색 - 리뷰 많은순, 별점 순 정렬 필요, 좋아요 순 완료
     public ResponseEntity<Page<RestaurantDto>> findRestaurantByKeyword (int page, String sort, String keyword, String city, String district, String dong) {
@@ -217,76 +175,5 @@ public class RestaurantService {
                 .avgStarRate(restaurantRepository.findStarRateByRestaurantId(restaurantEntity.getRestaurantId()))
                 .build();
     }
-
-//    // 식당 정보 수정
-//    public ResponseEntity<?> updateRestaurantInfo(Long restaurantId, UpdateRestaurantInfoDto restaurantDto, List<MultipartFile> multipartFileList) {
-//        Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
-//        if (restaurantEntityOptional.isEmpty()) {
-//            return ResponseEntity.status(200).body("restaurantId가 존재하지 않습니다.");
-//        } else {
-//            RestaurantEntity restaurantEntity = restaurantEntityOptional.get();
-//
-//            // 동엔티티 수정
-//            DongEntity dong = dongRepository.findByDongName(restaurantDto.getRestaurantAdministrativeDistrict().getDongName()).get();
-//
-//            // 식당 정보 수정
-//            restaurantEntity.setRestaurantName(restaurantDto.getRestaurantName());
-//            restaurantEntity.setRestaurantTelNum(restaurantDto.getRestaurantTelNum());
-//            restaurantEntity.setRestaurantAddress(restaurantDto.getRestaurantAddress());
-//            restaurantEntity.setRestaurantOpenTime(restaurantDto.getRestaurantOpenTime());
-//            restaurantEntity.setRestaurantBreakTime(restaurantDto.getRestaurantBreakTime());
-//            restaurantEntity.setRestaurantWebSite(restaurantDto.getRestaurantWebSite());
-//            restaurantEntity.setRestaurantStatus(restaurantDto.getRestaurantStatus());
-//            restaurantEntity.setDongEntity(dong);
-//
-//            // 기존 메뉴 엔티티 삭제
-//            List<RestaurantMenuEntity> existingMenuEntityList = restaurantEntity.getRestaurantMenuEntity();
-//            restaurantMenuRepository.deleteAll(existingMenuEntityList);//  기존 메뉴 엔티티 리스트 삭제
-//            restaurantEntity.getRestaurantMenuEntity().clear();
-//
-//            // 수정할 메뉴 dto -> entity 변환
-//            List<RestaurantMenuEntity> restaurantMenuEntityList = new ArrayList<>();
-//            List<RestaurantMenuUpdateDto> restaurantMenuDtoList = restaurantDto.getRestaurantMenuDtoList();
-//
-//            for (RestaurantMenuUpdateDto restaurantMenuUpdateDto : restaurantMenuDtoList) {
-//                RestaurantMenuEntity restaurantMenuEntity = RestaurantMenuEntity
-//                        .builder()
-//                        .restaurantMenuName(restaurantMenuUpdateDto.getRestaurantMenuName())
-//                        .restaurantMenuPrice(restaurantMenuUpdateDto.getRestaurantMenuPrice())
-//                        .restaurantEntity(restaurantEntity)
-//                        .build();
-//                restaurantMenuEntityList.add(restaurantMenuEntity);
-//            }
-//
-//            // 수정 후 메뉴 엔티티 리스트 저장 후 레스토랑에 연결
-//            restaurantMenuRepository.saveAll(restaurantMenuEntityList);
-//            restaurantEntity.setRestaurantMenuEntity(restaurantMenuEntityList);
-//
-//            // 대표 이미지 수정
-//            if(multipartFileList != null) {
-//                List<RestaurantImageEntity> restaurantImageEntityList = restaurantImageRepository.findAllByRestaurantEntity_RestaurantId(restaurantId);
-//                for(RestaurantImageEntity restaurantImageEntity : restaurantImageEntityList) {
-//                    String originImagePath = restaurantImageEntity.getRestaurantOriginUrl();
-//                    String resizedImagePath = restaurantImageEntity.getRestaurantResizeUrl();
-//
-//                    int originStartIndex = originImagePath.indexOf("restaurant" + restaurantId + "/");
-//                    String originFileName = originImagePath.substring(originStartIndex);
-//                    imageService.deleteS3File(originFileName);
-//
-//                    int resizedStartIndex = resizedImagePath.indexOf("restaurant" + restaurantId + "/");
-//                    String resizedFileName = resizedImagePath.substring(resizedStartIndex);
-//                    imageService.deleteS3File(resizedFileName);
-//                }
-//                restaurantImageRepository.deleteAll(restaurantImageEntityList);
-//
-//                String dirName = "restaurant" + restaurantId;
-//                imageService.upload(multipartFileList, dirName, restaurantEntity);
-//            }
-//
-//            // 변경된 내용을 저장
-//            restaurantRepository.save(restaurantEntity);
-//
-//            return ResponseEntity.status(200).body("식당 정보 및 메뉴 엔티티가 업데이트되었습니다.");
-//        }
 
 }

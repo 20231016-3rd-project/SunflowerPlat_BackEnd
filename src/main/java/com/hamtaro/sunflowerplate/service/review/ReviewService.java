@@ -3,9 +3,11 @@ package com.hamtaro.sunflowerplate.service.review;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.dto.review.*;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
+import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantImageEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
@@ -20,6 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -103,7 +108,7 @@ public class ReviewService {
         return resizeFile;
     }
 
-    //리뷰 작성 후 저장
+    //리뷰 작성 후 저장, 이미지 없어도 저장되도록 수정 필요
     @Transactional
     public ResponseEntity<?> saveUserReview(ReviewSaveDto reviewSaveDto, List<MultipartFile> imageFile, Long restaurantId, String userId) {
 
@@ -182,17 +187,18 @@ public class ReviewService {
             reviewImageDtoList.add(reviewImageDto);
         }
         ReviewReturnDto reviewReturnDto = ReviewReturnDto.builder()
-                    .reviewContent(reviewEntity.getReviewContent())
-                    .reviewStarRating(reviewEntity.getReviewStarRating())
-                    .reviewAt(reviewEntity.getReviewAt())
-                    .memberId(reviewEntity.getMemberEntity().getMemberId())
-                    .reviewImageDtoList(reviewImageDtoList)
-                    .build();
+                .reviewId(reviewId)
+                .reviewContent(reviewEntity.getReviewContent())
+                .reviewStarRating(reviewEntity.getReviewStarRating())
+                .reviewAt(reviewEntity.getReviewAt())
+                .memberId(reviewEntity.getMemberEntity().getMemberId())
+                .reviewImageDtoList(reviewImageDtoList)
+                .build();
         return ResponseEntity.status(200).body(reviewReturnDto);
-        }
+    }
 
-        //리뷰 신고
-        public ResponseEntity<?> reportReview(ReportDto reportDto, String useId){
+    //리뷰 신고
+    public ResponseEntity<?> reportReview(ReportDto reportDto, String useId) {
         MemberEntity memberEntity = memberRepository.findById(Long.valueOf(useId)).get();
         ReviewEntity reviewEntity = reviewRepository.findByReviewId(reportDto.getReviewId()).get();
         ReportEntity reportSaveEntity = ReportEntity.builder()
@@ -202,16 +208,47 @@ public class ReviewService {
                 .reviewEntity(reviewEntity)
                 .memberEntity(memberEntity)
                 .build();
-            Map<String, String> map = new HashMap<>();
-            Long result = reportRepository.save(reportSaveEntity).getReportId();
-            Optional<ReportEntity> findByReportId = reportRepository.findByReportId(result);
+        Map<String, String> map = new HashMap<>();
+        Long result = reportRepository.save(reportSaveEntity).getReportId();
+        Optional<ReportEntity> findByReportId = reportRepository.findByReportId(result);
 
-            if (findByReportId.isPresent()){
-                map.put("message", "신고가 접수되었습니다.");
-                return ResponseEntity.status(200).body(map);
-            }else {
-                map.put("message","신고가 접수되지 않았습니다.");
-                return ResponseEntity.status(400).body(map);
+        if (findByReportId.isPresent()) {
+            map.put("message", "신고가 접수되었습니다.");
+            return ResponseEntity.status(200).body(map);
+        } else {
+            map.put("message", "신고가 접수되지 않았습니다.");
+            return ResponseEntity.status(400).body(map);
+        }
+    }
+
+    public Page<ReviewReturnDto> findReviewPageByRestaurant(Long restaurantId, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<ReviewEntity> reviewEntityPage = reviewRepository.findAllByRestaurantEntity_RestaurantId(restaurantId, pageable);
+        return reviewEntityPage.map(this::reviewEntityToReviewReturnDto);
+    }
+
+    // entity -> dto
+    private ReviewReturnDto reviewEntityToReviewReturnDto (ReviewEntity reviewEntity) {
+            List<ReviewImageDto> reviewImageDtoList = new ArrayList<>();
+            List<ReviewImageEntity> reviewImageEntityList = reviewEntity.getReviewImageEntityList();
+            for (ReviewImageEntity reviewImage : reviewImageEntityList) {
+                ReviewImageDto reviewImageDto = ReviewImageDto.builder()
+                        .reviewImageId(reviewImage.getReviewImageId())
+                        .reviewOriginName(reviewImage.getReviewOriginName())
+                        .reviewStoredName(reviewImage.getReviewStoredName())
+                        .reviewResizeStoredName(reviewImage.getReviewResizeStoredName())
+                        .reviewOriginUrl(reviewImage.getReviewOriginUrl())
+                        .reviewResizeUrl(reviewImage.getReviewResizeUrl())
+                        .build();
+                reviewImageDtoList.add(reviewImageDto);
             }
+        return ReviewReturnDto.builder()
+                .reviewId(reviewEntity.getReviewId())
+                .reviewAt(reviewEntity.getReviewAt())
+                .reviewStarRating(reviewEntity.getReviewStarRating())
+                .memberId(reviewEntity.getMemberEntity().getMemberId())
+                .reviewContent(reviewEntity.getReviewContent())
+                .reviewImageDtoList(reviewImageDtoList)
+                .build();
     }
 }

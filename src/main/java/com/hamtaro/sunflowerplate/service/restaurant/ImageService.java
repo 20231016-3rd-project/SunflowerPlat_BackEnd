@@ -126,7 +126,4 @@ public class ImageService {
         amazonS3Client.deleteObject(new DeleteObjectRequest(RestaurantImageBucket, filename));
         System.out.printf("[%s] 삭제에 성공했습니다.\n", filename);
     }
-
-
-
 }

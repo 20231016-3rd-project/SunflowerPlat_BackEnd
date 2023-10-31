@@ -1,8 +1,10 @@
 package com.hamtaro.sunflowerplate.dto.restaurant;
 
 import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuDto;
+import com.hamtaro.sunflowerplate.dto.review.ReviewReturnDto;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -18,4 +20,5 @@ public class RestaurantDetailDto {
     private RestaurantLikeCountDto restaurantLikeCountDto;
     private List<RestaurantMenuDto> restaurantMenuDtoList;
     private List<RestaurantImageDto> restaurantImageDtoList;
+    private Page<ReviewReturnDto> reviewReturnDtoPage;
 }

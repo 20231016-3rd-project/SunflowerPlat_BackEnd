@@ -53,7 +53,7 @@ public class AdminController {
     }
 
     // 식당 정보 등록
-    @PostMapping( consumes = {"multipart/form-data"}, value="/restaurant/registration")
+    @PostMapping(consumes = {"multipart/form-data"}, value="/restaurant/registration")
     public ResponseEntity<?> saveRestaurantInfo(HttpServletRequest request,
                                                 @RequestPart(value = "data") RestaurantSaveDto restaurantSaveDto,
                                                 @RequestPart(name = "file") List<MultipartFile> multipartFilelist) throws IOException {
