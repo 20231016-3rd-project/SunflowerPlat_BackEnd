@@ -15,8 +15,7 @@ public class RestaurantDetailDto {
     private String restaurantOpenTime;
     private String restaurantBreakTime;
     private String restaurantWebSite;
-    private List<RestaurantImageDto> restaurantImageDtoList;
+    private RestaurantLikeCountDto restaurantLikeCountDto;
     private List<RestaurantMenuDto> restaurantMenuDtoList;
-
-//    private RestaurantLikeCountDto restaurantLikeCountDto;
+    private List<RestaurantImageDto> restaurantImageDtoList;
 }

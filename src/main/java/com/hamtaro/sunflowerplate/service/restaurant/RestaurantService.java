@@ -7,6 +7,7 @@ import com.hamtaro.sunflowerplate.dto.admin.UpdateRestaurantInfoDto;
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDetailDto;
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantImageDto;
+import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantLikeCountDto;
 import com.hamtaro.sunflowerplate.entity.address.DongEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantImageEntity;
@@ -73,6 +74,12 @@ public class RestaurantService {
                 restaurantImageDtoList.add(restaurantImageDto);
             }
 
+            RestaurantLikeCountDto restaurantLikeCountDto = RestaurantLikeCountDto
+                    .builder()
+                    .restaurantLikeCount(likeCountRepository.countByRestaurantEntity_RestaurantId(restaurantId))
+                    .likedRestaurant(false) // 로그인 후 좋아요 여부 체크 기능 필요
+                    .build();
+
 
             RestaurantDetailDto restaurantDetailDto = RestaurantDetailDto
                     .builder()
@@ -81,6 +88,7 @@ public class RestaurantService {
                     .restaurantAddress(restaurantEntity.getRestaurantAddress())
                     .restaurantOpenTime(restaurantEntity.getRestaurantOpenTime())
                     .restaurantBreakTime(restaurantEntity.getRestaurantBreakTime())
+                    .restaurantLikeCountDto(restaurantLikeCountDto)
                     .restaurantImageDtoList(restaurantImageDtoList)
                     .restaurantMenuDtoList(restaurantMenuDtoList)
                     .build();
@@ -203,6 +211,11 @@ public class RestaurantService {
                 .restaurantName(restaurantEntity.getRestaurantName())
                 .restaurantAddress(restaurantEntity.getRestaurantAddress())
                 .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
+                .resizedImageUrl(restaurantEntity.getRestaurantImageEntity()
+                        .stream()
+                        .findFirst()
+                        .map(RestaurantImageEntity::getRestaurantResizeUrl)
+                        .orElse("null"))
                 .likeCount(likeCountRepository.countByRestaurantEntity_RestaurantId(restaurantEntity.getRestaurantId()))
                 .reviewCount(restaurantEntity.getReviewEntityList().size())
                 .avgStarRate(restaurantRepository.findStarRateByRestaurantId(restaurantEntity.getRestaurantId()))

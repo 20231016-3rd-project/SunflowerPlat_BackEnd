@@ -1,4 +1,4 @@
-package com.hamtaro.sunflowerplate.controller;
+package com.hamtaro.sunflowerplate.controller.restaurant;
 
 import com.hamtaro.sunflowerplate.service.restaurant.MypageService;
 import lombok.RequiredArgsConstructor;
