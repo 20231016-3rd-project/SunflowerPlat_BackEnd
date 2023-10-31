@@ -49,4 +49,19 @@ public class MyPageController {
 
         }
     }
+
+    @GetMapping("/myplace")
+    public ResponseEntity<?> getMyPlace(HttpServletRequest request) {
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        return myPageService.getMyPlace(userId);
+    }
+
+    @GetMapping("/like")
+    public ResponseEntity<?> clickLike(HttpServletRequest request,@RequestParam Long restaurantId){
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        return myPageService.clickLikeButton(restaurantId,userId);
+    }
+
 }

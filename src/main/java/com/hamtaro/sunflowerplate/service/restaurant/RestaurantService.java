@@ -1,14 +1,10 @@
 package com.hamtaro.sunflowerplate.service.restaurant;
 
-import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuUpdateDto;
-import com.hamtaro.sunflowerplate.dto.admin.RestaurantSaveDto;
 import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuDto;
-import com.hamtaro.sunflowerplate.dto.admin.UpdateRestaurantInfoDto;
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDetailDto;
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantImageDto;
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantLikeCountDto;
-import com.hamtaro.sunflowerplate.entity.address.DongEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantImageEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantMenuEntity;
@@ -128,7 +124,6 @@ public class RestaurantService {
                 restaurantEntityPage = restaurantRepository.findByRestaurantNameAndLikeCountEntity_likeStatus(pageable,keyword);
             }
         } else {
-//            String properties = sort.equals("like") ? "likeCountEntityList.size" : "reviewEntityList.size";
             pageable = PageRequest.of(page,10, Sort.by(Sort.Direction.DESC, "reviewEntityList.size"));
 
             if(dong != null){ // 동 이름 + 키워드 검색
