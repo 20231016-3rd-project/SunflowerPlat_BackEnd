@@ -1,6 +1,6 @@
 package com.hamtaro.sunflowerplate.dto.member;
 
-import com.hamtaro.sunflowerplate.dto.ReviewImageDto;
+import com.hamtaro.sunflowerplate.dto.review.ReviewImageDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

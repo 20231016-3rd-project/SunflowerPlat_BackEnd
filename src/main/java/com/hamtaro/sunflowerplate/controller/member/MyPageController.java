@@ -42,19 +42,11 @@ public class MyPageController {
         Boolean check = myPageService.updateMyReview(reviewId, updateReviewDto, userId, imageFile);
         if (check) {
             return myPageService.updateMyReview(reviewId);
-//            return null;
         } else {
             Map<String, String> response = new HashMap<>();
             response.put("message", "권한없음");
             return ResponseEntity.status(403).body(response);
 
         }
-    }
-
-    @GetMapping("/myplace")
-    public ResponseEntity<?> getMyPlace(HttpServletRequest request) {
-        String header = request.getHeader(tokenProvider.loginAccessToken);
-        String userId = tokenProvider.getUserPk(header);
-        return myPageService.getMyPlace(userId);
     }
 }
