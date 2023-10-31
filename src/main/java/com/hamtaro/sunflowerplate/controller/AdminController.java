@@ -54,16 +54,22 @@ public class AdminController {
 
     // 식당 정보 등록
     @PostMapping( consumes = {"multipart/form-data"}, value="/restaurant/registration")
-    public ResponseEntity<?> saveRestaurantInfo(@RequestPart(value = "data") RestaurantSaveDto restaurantSaveDto,
+    public ResponseEntity<?> saveRestaurantInfo(HttpServletRequest request,
+                                                @RequestPart(value = "data") RestaurantSaveDto restaurantSaveDto,
                                                 @RequestPart(name = "file") List<MultipartFile> multipartFilelist) throws IOException {
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
         return adminService.saveRestaurant(restaurantSaveDto, multipartFilelist);
     }
 
-    // 식당 정보 확인
+    // 식당 정보 수정
     @PutMapping(consumes = {"multipart/form-data"}, value = "/restaurant/{restaurantId}")
-    public ResponseEntity<?> updateRestaurantInfo(@PathVariable Long restaurantId ,
+    public ResponseEntity<?> updateRestaurantInfo(HttpServletRequest request,
+                                                  @PathVariable Long restaurantId ,
                                                   @RequestPart(value = "data") UpdateRestaurantInfoDto restaurantDto,
                                                   @RequestPart(name = "file") List<MultipartFile> multipartFilelist) throws IOException {
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
         return adminService.updateRestaurantInfo(restaurantId, restaurantDto, multipartFilelist);
     }
 
