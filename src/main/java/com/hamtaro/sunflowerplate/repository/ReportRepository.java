@@ -10,4 +10,6 @@ public interface ReportRepository extends JpaRepository<ReportEntity,Long> {
     Optional<ReportEntity> findByReportId(Long useId);
 
     List<ReportEntity> findByMemberEntity_MemberId(Long memberId);
+
+
 }

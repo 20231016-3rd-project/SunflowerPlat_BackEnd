@@ -8,12 +8,17 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestDto {
+public class RequestUpdateDto {
 
     private Long requestId;
 
     private String requestContent; //요청 내용
 
     private LocalDate requestAt; // 요청 날짜
+
+    private Long memberId;
+
+    private Long restaurantId;
+
 
 }

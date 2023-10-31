@@ -20,10 +20,13 @@ public class ReviewImageEntity {
     private Long reviewImageId;
 
     @Column(name = "review_origin_name")
-    private String reviewOriginName;
+    private String reviewOriginName; //원본 파일
 
     @Column(name = "review_stored_name")
-    private String reviewStoredName;
+    private String reviewStoredName; //s3저장 이름
+
+    @Column(name = "review_resize_stored_name")
+    private String reviewResizeStoredName; //리사이즈 된 파일 s3저장 이름
 
     @Column(name = "review_origin_url")
     private String reviewOriginUrl;

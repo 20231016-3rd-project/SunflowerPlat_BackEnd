@@ -20,13 +20,13 @@ public class ReportEntity {
     @Column(name = "report_id")
     private Long reportId;
 
-    @Column(name = "report_category")
+    @Column(name = "report_category", nullable = false, length = 100)
     private String reportCategory;
 
-    @Column(name = "report_content")
+    @Column(name = "report_content", nullable = false, length = 1000)
     private String reportContent;
 
-    @Column(name = "report_at")
+    @Column(name = "report_at", nullable = false)
     private LocalDate reportAt;
 
     @ManyToOne
