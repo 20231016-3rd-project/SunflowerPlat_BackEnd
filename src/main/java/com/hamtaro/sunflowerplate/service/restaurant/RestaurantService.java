@@ -115,11 +115,11 @@ public class RestaurantService {
         } else if (sort.equals("like")) { // 좋아요 순 정렬
             pageable = PageRequest.of(page,10);
             if(dong != null){ // 동 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable,keyword,dong);
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongNameAndLikeCountEntity_likeStatus(pageable,keyword,dong);
             } else if (district != null) { // 구 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(pageable,keyword,district);
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndLikeCountEntity_likeStatus(pageable,keyword,district);
             } else if (city != null) { // 시 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(pageable, keyword, city);
+                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndLikeCountEntity_likeStatus(pageable, keyword, city);
             } else { // 키워드 검색
                 restaurantEntityPage = restaurantRepository.findByRestaurantNameAndLikeCountEntity_likeStatus(pageable,keyword);
             }
