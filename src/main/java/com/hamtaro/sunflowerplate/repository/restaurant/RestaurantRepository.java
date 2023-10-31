@@ -25,21 +25,21 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "WHERE r.restaurantName LIKE %:keyword% " +
             "AND r.dongEntity.dongName = :dong " +
             "AND r.restaurantStatus = 'OPEN'")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DongName(Pageable pageable, @Param("keyword") String keyword, String dong);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DongName(Pageable pageable, @Param("keyword") String keyword, @Param("dong") String dong);
 
     // 3. 키워드, district 입력
     @Query("SELECT r FROM RestaurantEntity r " +
             "WHERE r.restaurantName LIKE %:keyword% " +
             "AND r.dongEntity.districtsEntity.districtsName = :district " +
             "AND r.restaurantStatus = 'OPEN'")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(Pageable pageable, @Param("keyword") String keyword, String district);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(Pageable pageable, @Param("keyword") String keyword, @Param("district")String district);
 
     // 4. 키워드, city 입력
     @Query("SELECT r FROM RestaurantEntity r " +
             "WHERE r.restaurantName LIKE %:keyword% " +
             "AND r.dongEntity.districtsEntity.cityEntity.cityName = :city " +
             "AND r.restaurantStatus = 'OPEN'")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(Pageable pageable, @Param("keyword") String keyword, String city);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(Pageable pageable, @Param("keyword") String keyword, @Param("city") String city);
 
     // 좋아요 많은 순 정렬
     // 1. 키워드 입력
@@ -59,7 +59,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "AND r.restaurantStatus = 'OPEN' " +
             "GROUP BY r.restaurantId " +
             "ORDER BY SUM(CASE WHEN l.likeStatus = true THEN 1 ELSE 0 END) DESC ")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DongNameAndLikeCountEntity_likeStatus(Pageable pageable, @Param("keyword") String keyword, String dong);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DongNameAndLikeCountEntity_likeStatus(Pageable pageable, @Param("keyword") String keyword, @Param("dong") String dong);
 
     // 3. 키워드, district 입력
     @Query ("SELECT r FROM RestaurantEntity r " +
@@ -69,7 +69,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "AND r.restaurantStatus = 'OPEN'" +
             "GROUP BY r.restaurantId " +
             "ORDER BY SUM(CASE WHEN l.likeStatus = true THEN 1 ELSE 0 END) DESC")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndLikeCountEntity_likeStatus(Pageable pageable, @Param("keyword") String keyword, String district);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndLikeCountEntity_likeStatus(Pageable pageable, @Param("keyword") String keyword, @Param("district") String district);
 
     // 4. 키워드, city 입력
     @Query("SELECT r FROM RestaurantEntity r " +
@@ -79,7 +79,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "AND r.restaurantStatus = 'OPEN'"+
             "GROUP BY r.restaurantId " +
             "ORDER BY SUM(CASE WHEN l.likeStatus = true THEN 1 ELSE 0 END) DESC")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndLikeCountEntity_likeStatus(Pageable pageable, @Param("keyword") String keyword, String city);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndLikeCountEntity_likeStatus(Pageable pageable, @Param("keyword") String keyword, @Param("city")String city);
 
     // 1. 별점 순 정렬 + 키워드
     @Query("SELECT r " +
@@ -100,7 +100,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "AND r.restaurantStatus = 'OPEN' " +
             "GROUP BY r.restaurantId " +
             "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DongNameAndRate(Pageable pageable, @Param("keyword") String keyword,  String dong);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DongNameAndRate(Pageable pageable, @Param("keyword") String keyword, @Param("dong") String dong);
 
     // 3. 별점 순 정렬 + 키워드, district 입력
     @Query("SELECT r " +
@@ -111,7 +111,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "AND r.restaurantStatus = 'OPEN' " +
             "GROUP BY r.restaurantId " +
             "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndRate(Pageable pageable, @Param("keyword") String keyword,  String district);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndRate(Pageable pageable, @Param("keyword") String keyword, @Param("district") String district);
 
     // 4. 별점 순 정렬 + 키워드, city 입력
     @Query("SELECT r " +
@@ -122,7 +122,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "AND r.restaurantStatus = 'OPEN' " +
             "GROUP BY r.restaurantId " +
             "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
-    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndRate(Pageable pageable, @Param("keyword") String keyword,  String city);
+    Page<RestaurantEntity> findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndRate(Pageable pageable, @Param("keyword") String keyword, @Param("city") String city);
 
     // 별점 계산
     @Query("SELECT ROUND(COALESCE(AVG(review.reviewStarRating),0),2) " +
