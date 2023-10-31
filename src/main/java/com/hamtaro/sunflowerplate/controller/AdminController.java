@@ -1,15 +1,19 @@
 package com.hamtaro.sunflowerplate.controller;
 
 
-import com.hamtaro.sunflowerplate.dto.ReportDto;
+import com.hamtaro.sunflowerplate.dto.admin.RestaurantSaveDto;
+import com.hamtaro.sunflowerplate.dto.admin.UpdateRestaurantInfoDto;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -46,6 +50,21 @@ public class AdminController {
         String userId = tokenProvider.getUserPk(header);
 
         return adminService.adminRestaurantModifyCheck(userId);
+    }
+
+    // 식당 정보 등록
+    @PostMapping( consumes = {"multipart/form-data"}, value="/restaurant/registration")
+    public ResponseEntity<?> saveRestaurantInfo(@RequestPart(value = "data") RestaurantSaveDto restaurantSaveDto,
+                                                @RequestPart(name = "file") List<MultipartFile> multipartFilelist) throws IOException {
+        return adminService.saveRestaurant(restaurantSaveDto, multipartFilelist);
+    }
+
+    // 식당 정보 확인
+    @PutMapping(consumes = {"multipart/form-data"}, value = "/restaurant/{restaurantId}")
+    public ResponseEntity<?> updateRestaurantInfo(@PathVariable Long restaurantId ,
+                                                  @RequestPart(value = "data") UpdateRestaurantInfoDto restaurantDto,
+                                                  @RequestPart(name = "file") List<MultipartFile> multipartFilelist) throws IOException {
+        return adminService.updateRestaurantInfo(restaurantId, restaurantDto, multipartFilelist);
     }
 
 
