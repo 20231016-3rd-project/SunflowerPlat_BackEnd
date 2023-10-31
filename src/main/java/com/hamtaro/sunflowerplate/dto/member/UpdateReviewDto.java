@@ -16,8 +16,6 @@ import java.util.List;
 @Builder
 public class UpdateReviewDto {
 
-    private Long reviewId;
-
     private String reviewContent;
 
     private List<MultipartFile> imageFile;

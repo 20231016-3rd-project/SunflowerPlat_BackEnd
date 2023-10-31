@@ -25,8 +25,10 @@ public class MyPageController {
     }
 
     @DeleteMapping("/myreview")
-    public ResponseEntity<?> deleteMyReview(@RequestParam Long reviewId){
-        return myPageService.deleteMyReview(reviewId);
+    public ResponseEntity<?> deleteMyReview(HttpServletRequest request, @RequestParam Long reviewId) {
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        return myPageService.deleteMyReview(reviewId, userId);
     }
 
     @PutMapping("/myreview")
