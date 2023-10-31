@@ -27,4 +27,8 @@ public class LikeCountEntity {
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private RestaurantEntity restaurantEntity;
+
+    @Column(name = "like_status")
+    private boolean likeStatus;
+
 }

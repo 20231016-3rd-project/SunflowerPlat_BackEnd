@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "회원가입BodyRequest")
 public class MemberSaveDto {
     @NotNull
     @Schema(description = "이메일",example = "회원가입할 이메일")

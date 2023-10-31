@@ -19,13 +19,13 @@ public class DistrictsEntity {
     @Column(name = "districts_id")
     private Long districtsId;
 
-    @Column(name = "districts_name")
+    @Column(name = "districts_name", length = 10)
     private String districtsName;
 
     @ManyToOne
     @JoinColumn(name = "city_id")
     private CityEntity cityEntity;
 
-    @OneToMany(mappedBy = "districtsEntity" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "districtsEntity", cascade = CascadeType.ALL)
     private List<DongEntity> dongEntityList;
 }

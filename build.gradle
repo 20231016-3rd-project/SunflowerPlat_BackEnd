@@ -28,7 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	compileOnly 'org.projectlombok:lombok'
 	implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.445'
-	implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2' //이미지 리사이징을 위한 라이브러리
+	implementation 'net.coobird:thumbnailator:0.4.8'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
 	testImplementation 'junit:junit:4.13.1'
 	compileOnly 'org.projectlombok:lombok'

@@ -22,7 +22,7 @@ public class RequestEntity {
     @Column(name = "request_id")
     private Long requestId;
 
-    @Column(name = "request_content")
+    @Column(name = "request_content", nullable = false, length = 500)
     private String requestContent;
 
     @Column(name = "request_at")

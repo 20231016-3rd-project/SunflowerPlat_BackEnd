@@ -22,13 +22,13 @@ public class ReviewEntity {
     @Column(name = "review_id")
     private Long reviewId;
 
-    @Column(name = "review_content")
+    @Column(name = "review_content", nullable = false, length = 1000)
     private String reviewContent;
 
-    @Column(name = "review_star_rating")
+    @Column(name = "review_star_rating", nullable = false)
     private Integer reviewStarRating;
 
-    @Column(name = "review_at")
+    @Column(name = "review_at", nullable = false)
     private LocalDate reviewAt;
 
     @ManyToOne
@@ -39,12 +39,12 @@ public class ReviewEntity {
     @JoinColumn(name = "member_id")
     private MemberEntity memberEntity;
 
-    @OneToMany(mappedBy = "reviewEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reviewEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ReportEntity> reportEntityList;
 
-    @OneToMany(mappedBy = "reviewEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reviewEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<EmpathyEntity> empathyEntityList;
 
-    @OneToMany(mappedBy = "reviewEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reviewEntity",cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private List<ReviewImageEntity> reviewImageEntityList;
 }

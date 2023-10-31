@@ -9,12 +9,11 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@Schema(description = "로그인BodyRequest")
 public class MemberLoginDto {
     @NotNull
-    @Schema(description = "이메일",example = "로그인할 이메일")
+    @Schema(description = "이메일", example = "로그인 할 이메일")
     private String email;
     @NotNull
-    @Schema(description = "비밀번호",example = "로그인할 비밀번호")
+    @Schema(description = "비밀번호", example = "로그인 할 비밀번호")
     private String password;
 }

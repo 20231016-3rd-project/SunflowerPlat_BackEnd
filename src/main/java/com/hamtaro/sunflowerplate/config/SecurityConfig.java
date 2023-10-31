@@ -1,5 +1,7 @@
 package com.hamtaro.sunflowerplate.config;
 
+import com.hamtaro.sunflowerplate.jwt.config.JwtAuthenticationFilter;
+import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final TokenProvider tokenProvider;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -40,10 +44,15 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests(authorize ->
                         authorize
-                                .antMatchers("/**").permitAll()
-                                .anyRequest().hasRole("USER")
+                                .antMatchers("/sunflowerPlate/user*/**" , "/sunflowerPlate/login*/**", "/sunflowerPlate/restaurant*/**" , "/login/oauth2/code/google*/**").permitAll()
+                                .antMatchers("/sunflowerPlate/mypage/*").hasRole("USER")
+                                .antMatchers("/sunflowerPlate/admin*/**").hasRole("ADMIN")
+                                .anyRequest().hasAnyRole("USER","ADMIN")
                 )
-                .exceptionHandling();
+                .exceptionHandling()
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
@@ -53,6 +62,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://localhost:8080");
+        configuration.addAllowedOrigin("https://localhost:8080");
+        configuration.addAllowedOrigin("https://localhost:3000");
         configuration.addAllowedMethod("GET");
         configuration.addAllowedMethod("POST");
         configuration.addAllowedMethod("PUT");
