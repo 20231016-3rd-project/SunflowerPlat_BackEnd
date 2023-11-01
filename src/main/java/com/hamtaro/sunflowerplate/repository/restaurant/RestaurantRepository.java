@@ -131,16 +131,4 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "WHERE r.restaurantId = :restaurantId")
     BigDecimal findStarRateByRestaurantId(Long restaurantId);
 
-
-
-
-
-    // 지역 이름으로 검색
-    @Query("SELECT r FROM RestaurantEntity r" +
-            " WHERE r.dongEntity.dongName LIKE %:add%" +
-            " OR r.dongEntity.districtsEntity.districtsName LIKE %:add%" +
-            " OR r.dongEntity.districtsEntity.cityEntity.cityName LIKE %:add% " +
-            "AND r.restaurantStatus = 'OPEN'")
-    Page<RestaurantEntity> findByAddress(Pageable pageable, @Param("add") String add);
-
 }

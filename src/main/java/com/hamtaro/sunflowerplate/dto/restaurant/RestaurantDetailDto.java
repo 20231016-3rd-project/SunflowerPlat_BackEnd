@@ -6,12 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.domain.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 @Builder
 public class RestaurantDetailDto {
     private String restaurantName;
+    private BigDecimal restaurantStarRate;
+    private String restaurantStatus;
     private String restaurantTelNum;
     private String restaurantAddress;
     private String restaurantOpenTime;

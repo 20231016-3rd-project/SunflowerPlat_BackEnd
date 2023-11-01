@@ -3,6 +3,8 @@ package com.hamtaro.sunflowerplate.controller.member;
 import com.hamtaro.sunflowerplate.dto.member.UpdateReviewDto;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.member.MyPageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/sunflowerPlate/mypage")
+@Tag(name = "마이페이지", description = "마이페이지 관련 API")
 public class MyPageController {
 
     private final MyPageService myPageService;
@@ -57,6 +60,8 @@ public class MyPageController {
         return myPageService.getMyPlace(userId);
     }
 
+    @Tag(name = "식당", description = "식당 관련 API")
+    @Operation(summary = "식당 좋아요 저장", description = "식당 관련 API")
     @GetMapping("/like")
     public ResponseEntity<?> clickLike(HttpServletRequest request,@RequestParam Long restaurantId){
         String header = request.getHeader(tokenProvider.loginAccessToken);

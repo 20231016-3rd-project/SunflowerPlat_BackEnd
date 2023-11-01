@@ -89,6 +89,8 @@ public class RestaurantService {
             RestaurantDetailDto restaurantDetailDto = RestaurantDetailDto
                     .builder()
                     .restaurantName(restaurantEntity.getRestaurantName())
+                    .restaurantStarRate(restaurantRepository.findStarRateByRestaurantId(restaurantId))
+                    .restaurantStatus(restaurantEntity.getRestaurantStatus())
                     .restaurantTelNum(restaurantEntity.getRestaurantTelNum())
                     .restaurantAddress(restaurantEntity.getRestaurantAddress())
                     .restaurantOpenTime(restaurantEntity.getRestaurantOpenTime())
@@ -145,16 +147,6 @@ public class RestaurantService {
             }
         }
 
-        restaurantDtoPage = restaurantEntityPage
-                .map(this::restaurantEntityToRestaurantDto);
-        return ResponseEntity.status(200).body(restaurantDtoPage);
-    }
-
-    // 지역 검색
-    public ResponseEntity<Page<RestaurantDto>> findRestaurantByAddress(String add, int page) {
-        Pageable pageable = PageRequest.of(page,10);
-        Page<RestaurantDto> restaurantDtoPage;
-        Page<RestaurantEntity> restaurantEntityPage= restaurantRepository.findByAddress(pageable,add);
         restaurantDtoPage = restaurantEntityPage
                 .map(this::restaurantEntityToRestaurantDto);
         return ResponseEntity.status(200).body(restaurantDtoPage);
