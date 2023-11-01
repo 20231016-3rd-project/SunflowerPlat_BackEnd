@@ -22,4 +22,6 @@ public class ReviewReturnDto {
     private LocalDate reviewAt;
 
     private List<ReviewImageDto> reviewImageDtoList;
+    private int reviewEmpathyCount;
+    private boolean empathyReview;
 }

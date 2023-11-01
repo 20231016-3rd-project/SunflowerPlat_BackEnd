@@ -7,6 +7,8 @@ import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 
 import com.hamtaro.sunflowerplate.service.review.EmpathyService;
 import com.hamtaro.sunflowerplate.service.review.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/sunflowerPlate/user")
 @RequiredArgsConstructor
+@Tag(name = "리뷰", description = "리뷰 관련 API")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -29,6 +32,8 @@ public class ReviewController {
 
 
     //유저 레스토랑 정보 신고 및 수정
+    @Tag(name = "식당", description = "식당 관련 API")
+    @Operation(summary = "레스토랑 정보 신고 및 수정 요청", description = "식당 관련 API")
     @PostMapping("/restaurant/edit")
     public ResponseEntity<Map<String, String>> requestRestaurant(HttpServletRequest request,
                                                                  @RequestBody RequestUpdateDto requestUpdateDto) {
@@ -41,9 +46,11 @@ public class ReviewController {
 
 
     //리뷰 작성 후 저장
+    @Tag(name = "리뷰", description = "리뷰 관련 API")
+    @Operation(summary = "리뷰 작성 후 저장", description = "리뷰 관련 API")
     @PostMapping(consumes = {"multipart/form-data"}, value="/review/new")
     public ResponseEntity<?> createReview(@RequestPart("reviewSaveDto") ReviewSaveDto reviewSaveDto,
-                                          @RequestPart(value = "imageFile", required = false) List<MultipartFile> imageFile,
+                                          @RequestPart(required = false) List<MultipartFile> imageFile,
                                           @RequestParam Long restaurantId, HttpServletRequest request) {
 
         String header = request.getHeader(tokenProvider.loginAccessToken);
@@ -52,6 +59,8 @@ public class ReviewController {
     }
 
     //리뷰 신고하기
+    @Tag(name = "리뷰", description = "리뷰 관련 API")
+    @Operation(summary = "리뷰 신고하기", description = "리뷰 관련 API")
     @PostMapping("/report")
     public ResponseEntity<?> alertReview(@RequestBody ReportDto reportDto, HttpServletRequest request) {
         String header = request.getHeader(tokenProvider.loginAccessToken);
@@ -61,12 +70,13 @@ public class ReviewController {
     }
 
     //좋아요기능
+    @Tag(name = "리뷰", description = "리뷰 관련 API")
+    @Operation(summary = "리뷰 좋아요", description = "리뷰 관련 API")
     @PostMapping("/{reviewId}/like")
     public ResponseEntity<?> like(@PathVariable Long reviewId, HttpServletRequest request) {
 
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
-
 
         return empathyService.countPlus(reviewId,userId);
 

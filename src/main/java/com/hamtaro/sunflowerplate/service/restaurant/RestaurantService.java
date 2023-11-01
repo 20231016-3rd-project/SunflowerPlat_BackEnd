@@ -37,7 +37,7 @@ public class RestaurantService {
     private final ReviewService reviewService;
 
     // 식당 정보 조회 - 리뷰 조회 추가 필요
-    public ResponseEntity<?> findRestaurantDetailsById(Long restaurantId, int reviewPage) {
+    public ResponseEntity<?> findRestaurantDetailsById(Long restaurantId, int reviewPage,String reviewSort, String userId) {
         Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
 
         if (restaurantEntityOptional.isEmpty()) {
@@ -70,25 +70,36 @@ public class RestaurantService {
                 restaurantImageDtoList.add(restaurantImageDto);
             }
 
+            boolean likeButton;
+            if(userId.equals("notLogin")) {
+                likeButton = false;
+            } else {
+                Long memberId = Long.valueOf(userId);
+                likeButton = likeCountRepository.findByMemberEntityAndRestaurantEntity(memberId, restaurantId).isPresent();
+            }
+
             // 좋아요 불러오기
             RestaurantLikeCountDto restaurantLikeCountDto = RestaurantLikeCountDto
                     .builder()
                     .restaurantLikeCount(likeCountRepository.countByRestaurantEntity_RestaurantId(restaurantId))
-                    .likedRestaurant(false) // 로그인 후 좋아요 여부 체크 기능 필요
+                    .likedRestaurant(likeButton)
                     .build();
 
             // Entity -> Dto 변환
             RestaurantDetailDto restaurantDetailDto = RestaurantDetailDto
                     .builder()
                     .restaurantName(restaurantEntity.getRestaurantName())
+                    .restaurantStarRate(restaurantRepository.findStarRateByRestaurantId(restaurantId))
+                    .restaurantStatus(restaurantEntity.getRestaurantStatus())
                     .restaurantTelNum(restaurantEntity.getRestaurantTelNum())
                     .restaurantAddress(restaurantEntity.getRestaurantAddress())
                     .restaurantOpenTime(restaurantEntity.getRestaurantOpenTime())
                     .restaurantBreakTime(restaurantEntity.getRestaurantBreakTime())
+                    .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
                     .restaurantLikeCountDto(restaurantLikeCountDto)
                     .restaurantImageDtoList(restaurantImageDtoList)
                     .restaurantMenuDtoList(restaurantMenuDtoList)
-                    .reviewReturnDtoPage(reviewService.findReviewPageByRestaurant(restaurantId,reviewPage))
+                    .reviewReturnDtoPage(reviewService.findReviewPageByRestaurant(restaurantId,reviewPage,reviewSort, userId))
                     .build();
 
             return ResponseEntity.status(200).body(restaurantDetailDto);
@@ -137,16 +148,6 @@ public class RestaurantService {
             }
         }
 
-        restaurantDtoPage = restaurantEntityPage
-                .map(this::restaurantEntityToRestaurantDto);
-        return ResponseEntity.status(200).body(restaurantDtoPage);
-    }
-
-    // 지역 검색
-    public ResponseEntity<Page<RestaurantDto>> findRestaurantByAddress(String add, int page) {
-        Pageable pageable = PageRequest.of(page,10);
-        Page<RestaurantDto> restaurantDtoPage;
-        Page<RestaurantEntity> restaurantEntityPage= restaurantRepository.findByAddress(pageable,add);
         restaurantDtoPage = restaurantEntityPage
                 .map(this::restaurantEntityToRestaurantDto);
         return ResponseEntity.status(200).body(restaurantDtoPage);

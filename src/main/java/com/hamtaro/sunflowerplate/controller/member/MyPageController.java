@@ -20,7 +20,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/sunflowerPlate/mypage")
-@Tag(name = "마이페이지", description = "마이페이지관련 API")
+@Tag(name = "마이페이지", description = "마이페이지 관련 API")
 public class MyPageController {
 
     private final MyPageService myPageService;
@@ -70,6 +70,8 @@ public class MyPageController {
         return myPageService.getMyPlace(userId);
     }
 
+    @Tag(name = "식당", description = "식당 관련 API")
+    @Operation(summary = "식당 좋아요 저장", description = "식당 관련 API")
     @GetMapping("/like")
     public ResponseEntity<?> clickLike(HttpServletRequest request,@RequestParam Long restaurantId){
         String header = request.getHeader(tokenProvider.loginAccessToken);

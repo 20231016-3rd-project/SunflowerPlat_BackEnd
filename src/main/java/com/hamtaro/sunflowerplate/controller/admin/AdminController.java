@@ -5,6 +5,8 @@ import com.hamtaro.sunflowerplate.dto.admin.RestaurantSaveDto;
 import com.hamtaro.sunflowerplate.dto.admin.UpdateRestaurantInfoDto;
 import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.admin.AdminService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +21,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/sunflowerPlate/admin")
 @RequiredArgsConstructor
+@Tag(name = "관리자", description = "관리자 관련 API")
 public class AdminController {
 
     private final AdminService adminService;
     private final TokenProvider tokenProvider;
 
+    @Tag(name = "관리자", description = "관리자 관련 API")
+    @Operation(summary = "리뷰 삭제", description = "관리자 관련 API")
     @DeleteMapping("/review/delete")
     public ResponseEntity<?> removeAdminReview(@RequestParam Long reviewId, HttpServletRequest request){
         String header = request.getHeader(tokenProvider.loginAccessToken);
@@ -32,6 +37,8 @@ public class AdminController {
         return adminService.deleteAdminReview(reviewId, userId);
     }
 
+    @Tag(name = "관리자", description = "관리자 관련 API")
+    @Operation(summary = "신고 확인", description = "관리자 관련 API")
     //관리자 신고 확인
     @GetMapping("/review/")
     public ResponseEntity<?> reviewReport(HttpServletRequest request) {
@@ -42,6 +49,8 @@ public class AdminController {
         return adminService.adminReportCheck(userId);
     }
 
+    @Tag(name = "관리자", description = "관리자 관련 API")
+    @Operation(summary = "식당 정보 수정 요청 확인", description = "관리자 관련 API")
     //관리자 식당 정보 수정 요청 확인
     @GetMapping("/restaurant/edit/")
     public ResponseEntity<?> requestRestaurant(HttpServletRequest request){
@@ -52,6 +61,8 @@ public class AdminController {
         return adminService.adminRestaurantModifyCheck(userId);
     }
 
+    @Tag(name = "관리자", description = "관리자 관련 API")
+    @Operation(summary = "식당 정보 등록", description = "관리자 관련 API")
     // 식당 정보 등록
     @PostMapping(consumes = {"multipart/form-data"}, value="/restaurant/registration")
     public ResponseEntity<?> saveRestaurantInfo(HttpServletRequest request,
@@ -62,6 +73,8 @@ public class AdminController {
         return adminService.saveRestaurant(restaurantSaveDto, multipartFilelist);
     }
 
+    @Tag(name = "관리자", description = "관리자 관련 API")
+    @Operation(summary = "식당 정보 수정", description = "관리자 관련 API")
     // 식당 정보 수정
     @PutMapping(consumes = {"multipart/form-data"}, value = "/restaurant/{restaurantId}")
     public ResponseEntity<?> updateRestaurantInfo(HttpServletRequest request,
