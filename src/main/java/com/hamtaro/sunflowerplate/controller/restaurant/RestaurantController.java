@@ -1,6 +1,7 @@
 package com.hamtaro.sunflowerplate.controller.restaurant;
 
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
+import com.hamtaro.sunflowerplate.jwt.config.TokenProvider;
 import com.hamtaro.sunflowerplate.service.restaurant.RestaurantService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,17 +10,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/sunflowerPlate/restaurant")
 @Tag(name = "식당", description = "식당 관련 API")
 public class RestaurantController {
     private final RestaurantService restaurantService;
+    private final TokenProvider tokenProvider;
 
     @GetMapping("/{restaurantId}")
-    public ResponseEntity<?> findRestaurantInfo(@PathVariable Long restaurantId,
+    public ResponseEntity<?> findRestaurantInfo(HttpServletRequest request,
+                                                @PathVariable Long restaurantId,
                                                 @RequestParam(defaultValue = "1") int reviewPage){
-        return restaurantService.findRestaurantDetailsById(restaurantId, reviewPage-1);
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId;
+        if(header == null) {
+            userId = "notLogin";
+        } else {
+            userId = tokenProvider.getUserPk(header);
+        }
+        return restaurantService.findRestaurantDetailsById(restaurantId, reviewPage-1, userId);
     }
 
     @GetMapping("/search")

@@ -14,10 +14,7 @@ import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewImageEntity;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantRepository;
-import com.hamtaro.sunflowerplate.repository.review.ReportRepository;
-import com.hamtaro.sunflowerplate.repository.review.RequestRepository;
-import com.hamtaro.sunflowerplate.repository.review.ReviewImageRepository;
-import com.hamtaro.sunflowerplate.repository.review.ReviewRepository;
+import com.hamtaro.sunflowerplate.repository.review.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnails;
@@ -53,6 +50,7 @@ public class ReviewService {
     private final RestaurantRepository restaurantRepository;
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
+    private final EmpathyRepository empathyRepository;
 
 
     //식당 정보 수정 요청(Modify x , Post)
@@ -128,7 +126,6 @@ public class ReviewService {
 
             for (MultipartFile multipartFile : imageFile) {
                 String fileName = multipartFile.getOriginalFilename(); //원본 파일
-                //엔티티 연결 필요
                 try {
                     //이미지 객체 생성
                     ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -146,7 +143,6 @@ public class ReviewService {
                     File resizedImageFile = resizeImage(multipartFile);
                     amazonS3Client.putObject(bucketName, resizeName, resizedImageFile);
                     String resizeUrl = amazonS3Client.getUrl(bucketName, resizeName).toString();
-
 
                     ReviewImageEntity reviewImageEntity = ReviewImageEntity.builder()
                             .reviewOriginName(fileName)
@@ -197,7 +193,6 @@ public class ReviewService {
                     .reviewImageDtoList(reviewImageDtoList)
                     .build();
             return ResponseEntity.status(200).body(reviewReturnDto);
-
         } else {
             ReviewReturnDto reviewReturnDto = ReviewReturnDto.builder()
                     .reviewId(reviewId)
@@ -205,9 +200,10 @@ public class ReviewService {
                     .reviewStarRating(reviewEntity.getReviewStarRating())
                     .reviewAt(reviewEntity.getReviewAt())
                     .memberId(reviewEntity.getMemberEntity().getMemberId())
+                    .reviewEmpathyCount(0)
+                    .empathyReview(false)
                     .build();
             return ResponseEntity.status(200).body(reviewReturnDto);
-
         }
     }
 
@@ -235,14 +231,14 @@ public class ReviewService {
         }
     }
 
-    public Page<ReviewReturnDto> findReviewPageByRestaurant(Long restaurantId, int page) {
+    public Page<ReviewReturnDto> findReviewPageByRestaurant(Long restaurantId, int page, String userId) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<ReviewEntity> reviewEntityPage = reviewRepository.findAllByRestaurantEntity_RestaurantId(restaurantId, pageable);
-        return reviewEntityPage.map(this::reviewEntityToReviewReturnDto);
+        return reviewEntityPage.map((ReviewEntity reviewEntity) -> reviewEntityToReviewReturnDto(reviewEntity, userId));
     }
 
     // entity -> dto
-    private ReviewReturnDto reviewEntityToReviewReturnDto (ReviewEntity reviewEntity) {
+    private ReviewReturnDto reviewEntityToReviewReturnDto (ReviewEntity reviewEntity, String userId) {
             List<ReviewImageDto> reviewImageDtoList = new ArrayList<>();
             List<ReviewImageEntity> reviewImageEntityList = reviewEntity.getReviewImageEntityList();
             for (ReviewImageEntity reviewImage : reviewImageEntityList) {
@@ -256,6 +252,15 @@ public class ReviewService {
                         .build();
                 reviewImageDtoList.add(reviewImageDto);
             }
+
+        boolean empathyButton;
+        if(userId.equals("notLogin")) {
+            empathyButton = false;
+        } else {
+            Long memberId = Long.valueOf(userId);
+            empathyButton = empathyRepository.findByMemberEntityAndReviewEntity(memberRepository.findById(memberId).get(), reviewEntity).isPresent();
+        }
+
         return ReviewReturnDto.builder()
                 .reviewId(reviewEntity.getReviewId())
                 .reviewAt(reviewEntity.getReviewAt())
@@ -263,6 +268,8 @@ public class ReviewService {
                 .memberId(reviewEntity.getMemberEntity().getMemberId())
                 .reviewContent(reviewEntity.getReviewContent())
                 .reviewImageDtoList(reviewImageDtoList)
+                .empathyReview(empathyButton)
+                .reviewEmpathyCount(empathyRepository.countByReviewEntity(reviewEntity))
                 .build();
     }
 }
