@@ -7,10 +7,11 @@ services:
     environment:
       - LANG=ko_KR.UTF-8
       - HTTP_PORT=9000
+      - TZ: "Asia/Seoul"
+
     ports:
       - '8080:8080'
-  environment:
-    - TZ=Asia/Seoul
+
 networks:
   default:
     name: service-network
