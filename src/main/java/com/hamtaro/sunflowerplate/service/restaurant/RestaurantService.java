@@ -95,6 +95,7 @@ public class RestaurantService {
                     .restaurantAddress(restaurantEntity.getRestaurantAddress())
                     .restaurantOpenTime(restaurantEntity.getRestaurantOpenTime())
                     .restaurantBreakTime(restaurantEntity.getRestaurantBreakTime())
+                    .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
                     .restaurantLikeCountDto(restaurantLikeCountDto)
                     .restaurantImageDtoList(restaurantImageDtoList)
                     .restaurantMenuDtoList(restaurantMenuDtoList)
