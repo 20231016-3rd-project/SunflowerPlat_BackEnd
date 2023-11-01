@@ -3,11 +3,9 @@ package com.hamtaro.sunflowerplate.service.review;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.dto.review.*;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
-import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantImageEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
@@ -211,22 +209,30 @@ public class ReviewService {
     public ResponseEntity<?> reportReview(ReportDto reportDto, String useId) {
         MemberEntity memberEntity = memberRepository.findById(Long.valueOf(useId)).get();
         ReviewEntity reviewEntity = reviewRepository.findByReviewId(reportDto.getReviewId()).get();
-        ReportEntity reportSaveEntity = ReportEntity.builder()
-                .reportCategory(reportDto.getReportCategory())
-                .reportContent(reportDto.getReportContent())
-                .reportAt(LocalDate.now())
-                .reviewEntity(reviewEntity)
-                .memberEntity(memberEntity)
-                .build();
-        Map<String, String> map = new HashMap<>();
-        Long result = reportRepository.save(reportSaveEntity).getReportId();
-        Optional<ReportEntity> findByReportId = reportRepository.findByReportId(result);
 
-        if (findByReportId.isPresent()) {
-            map.put("message", "신고가 접수되었습니다.");
-            return ResponseEntity.status(200).body(map);
+        Map<String, String> map = new HashMap<>();
+
+        if (reviewEntity.getMemberEntity().getMemberId() != Long.valueOf(useId)){
+            ReportEntity reportSaveEntity = ReportEntity.builder()
+                    .reportCategory(reportDto.getReportCategory())
+                    .reportContent(reportDto.getReportContent())
+                    .reportAt(LocalDate.now())
+                    .reviewEntity(reviewEntity)
+                    .memberEntity(memberEntity)
+                    .build();
+            Long result = reportRepository.save(reportSaveEntity).getReportId();
+            Optional<ReportEntity> findByReportId = reportRepository.findByReportId(result);
+
+            if (findByReportId.isPresent()) {
+                map.put("message", "신고가 접수되었습니다.");
+                return ResponseEntity.status(200).body(map);
+
+            } else {
+                map.put("message", "신고가 접수되지 않았습니다.");
+                return ResponseEntity.status(400).body(map);
+            }
         } else {
-            map.put("message", "신고가 접수되지 않았습니다.");
+            map.put("message", "신고할 수 없는 아이디입니다");
             return ResponseEntity.status(400).body(map);
         }
     }
