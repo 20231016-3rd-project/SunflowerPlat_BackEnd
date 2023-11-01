@@ -2,6 +2,7 @@ package com.hamtaro.sunflowerplate.controller.restaurant;
 
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.service.restaurant.RestaurantService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/sunflowerPlate/restaurant")
+@Tag(name = "식당", description = "식당 관련 API")
 public class RestaurantController {
     private final RestaurantService restaurantService;
 
