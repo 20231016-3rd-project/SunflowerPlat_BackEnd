@@ -43,7 +43,7 @@ public class ReviewController {
     //리뷰 작성 후 저장
     @PostMapping(consumes = {"multipart/form-data"}, value="/review/new")
     public ResponseEntity<?> createReview(@RequestPart("reviewSaveDto") ReviewSaveDto reviewSaveDto,
-                                          @RequestPart(value = "imageFile", required = false) List<MultipartFile> imageFile,
+                                          @RequestPart(required = false) List<MultipartFile> imageFile,
                                           @RequestParam Long restaurantId, HttpServletRequest request) {
 
         String header = request.getHeader(tokenProvider.loginAccessToken);
