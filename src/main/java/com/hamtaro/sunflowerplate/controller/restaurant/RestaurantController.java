@@ -26,7 +26,8 @@ public class RestaurantController {
     @GetMapping("/{restaurantId}")
     public ResponseEntity<?> findRestaurantInfo(HttpServletRequest request,
                                                 @PathVariable Long restaurantId,
-                                                @RequestParam(defaultValue = "1") int reviewPage){
+                                                @RequestParam(defaultValue = "1") int reviewPage,
+                                                @RequestParam(defaultValue = "reviewAt") String reviewSort){
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId;
         if(header == null) {
@@ -34,7 +35,7 @@ public class RestaurantController {
         } else {
             userId = tokenProvider.getUserPk(header);
         }
-        return restaurantService.findRestaurantDetailsById(restaurantId, reviewPage-1, userId);
+        return restaurantService.findRestaurantDetailsById(restaurantId, reviewPage-1, reviewSort, userId);
     }
 
     @Tag(name = "식당", description = "식당 관련 API")

@@ -37,7 +37,7 @@ public class RestaurantService {
     private final ReviewService reviewService;
 
     // 식당 정보 조회 - 리뷰 조회 추가 필요
-    public ResponseEntity<?> findRestaurantDetailsById(Long restaurantId, int reviewPage, String userId) {
+    public ResponseEntity<?> findRestaurantDetailsById(Long restaurantId, int reviewPage,String reviewSort, String userId) {
         Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
 
         if (restaurantEntityOptional.isEmpty()) {
@@ -98,7 +98,7 @@ public class RestaurantService {
                     .restaurantLikeCountDto(restaurantLikeCountDto)
                     .restaurantImageDtoList(restaurantImageDtoList)
                     .restaurantMenuDtoList(restaurantMenuDtoList)
-                    .reviewReturnDtoPage(reviewService.findReviewPageByRestaurant(restaurantId,reviewPage,userId))
+                    .reviewReturnDtoPage(reviewService.findReviewPageByRestaurant(restaurantId,reviewPage,reviewSort, userId))
                     .build();
 
             return ResponseEntity.status(200).body(restaurantDetailDto);

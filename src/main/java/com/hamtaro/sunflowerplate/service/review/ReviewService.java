@@ -237,9 +237,15 @@ public class ReviewService {
         }
     }
 
-    public Page<ReviewReturnDto> findReviewPageByRestaurant(Long restaurantId, int page, String userId) {
+    public Page<ReviewReturnDto> findReviewPageByRestaurant(Long restaurantId, int page, String sort, String userId) {
         Pageable pageable = PageRequest.of(page, 10);
-        Page<ReviewEntity> reviewEntityPage = reviewRepository.findAllByRestaurantEntity_RestaurantId(restaurantId, pageable);
+        Page<ReviewEntity> reviewEntityPage;
+        if (sort.equals("empathy")){
+            reviewEntityPage = reviewRepository.findReviewEntityByReviewIdAndEmpathyEntity(pageable, restaurantId);
+        }
+        else {
+            reviewEntityPage = reviewRepository.findReviewEntityByReviewIdAndAndReviewAt(pageable,restaurantId);
+        }
         return reviewEntityPage.map((ReviewEntity reviewEntity) -> reviewEntityToReviewReturnDto(reviewEntity, userId));
     }
 
