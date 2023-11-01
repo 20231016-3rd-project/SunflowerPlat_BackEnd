@@ -7,7 +7,7 @@ services:
     environment:
       - LANG=ko_KR.UTF-8
       - HTTP_PORT=9000
-      - TZ: Asia/Seoul
+      - TZ:Asia/Seoul
     ports:
       - '8081:8080'
 
