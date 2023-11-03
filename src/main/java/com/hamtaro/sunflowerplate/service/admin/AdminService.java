@@ -54,6 +54,7 @@ public class AdminService {
     private final LikeCountRepository likeCountRepository;
     private final ImageService imageService;
 
+    @Transactional
     public ResponseEntity<?> saveRestaurant(RestaurantSaveDto restaurantSaveDto, List<MultipartFile> multipartFileList) throws IOException {
 
         // 동엔티티 설정
@@ -91,13 +92,11 @@ public class AdminService {
             imageService.upload(multipartFileList, dirName, restaurantEntity);
         }
 
-
         if (restaurantRepository.findById(restaurantId).isEmpty()) {
             return ResponseEntity.status(400).body("식당 등록에 실패하였습니다.");
         } else {
-            return ResponseEntity.status(200).body("식당 등록에 성공하였습니다.");
+            return ResponseEntity.status(200).body("식당 등록에 성공하였습니다.\nrestaurantId : " + restaurantId);
         }
-
     }
 
     // 식당 정보 수정
@@ -247,21 +246,22 @@ public class AdminService {
     }
 
     public ResponseEntity<?> findRestaurantForAdmin(int page, String sort, String keyword, String city, String district, String dong) {
+        // 관리자 식당 리스트 조회
         Sort sortBy = getSortByCriterion(sort);
         if (sortBy == null) {
-            return ResponseEntity.status(400).body("잘못된 접근입니다.");
+            return ResponseEntity.status(404).body("잘못된 접근입니다.");
         }
 
         Pageable pageable = PageRequest.of(page, 10, sortBy);
         Page<RestaurantDto> restaurantDtoPage;
         Page<RestaurantEntity> restaurantEntityPage = searchRestaurantForAdmin(pageable, keyword, dong, district, city);
-        restaurantDtoPage = restaurantEntityPage
+        restaurantDtoPage = restaurantEntityPage // dto -> entity
                 .map(this::restaurantEntityToRestaurantDto);
         return ResponseEntity.status(200).body(restaurantDtoPage);
     }
 
     private Page<RestaurantEntity> searchRestaurantForAdmin(Pageable pageable, String keyword, String dong, String district, String city) {
-
+        // 폐업 식당 포함 검색
         if (dong != null) { // 동 이름 + 키워드 검색
             return restaurantRepository.findByRestaurantNameAndDongNameForAdmin(pageable, keyword, dong);
         } else if (district != null) { // 구 이름 + 키워드 검색
@@ -277,7 +277,7 @@ public class AdminService {
         if ("rateDesc".equals(sort)) {
             return Sort.by(Sort.Direction.DESC, "reviewEntity.size");
         } else if (("latest").equals(sort)) {
-            return Sort.by("restaurantId");
+            return Sort.by(Sort.Direction.DESC,"restaurantId");
         } else {
             return null;
         }
