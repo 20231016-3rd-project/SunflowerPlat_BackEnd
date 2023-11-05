@@ -35,9 +35,6 @@ public class RestaurantEntity {
     @Column(name = "restaurant_open_time")
     private String restaurantOpenTime;
 
-    @Column(name = "restaurant_break_time")
-    private String restaurantBreakTime;
-
     @Column(name = "restaurant_web_site")
     private String restaurantWebSite;
 

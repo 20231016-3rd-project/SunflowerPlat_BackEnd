@@ -41,7 +41,12 @@ public class RestaurantService {
         Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
 
         if (restaurantEntityOptional.isEmpty()) {
-            return ResponseEntity.status(200).body("식당이 존재하지 않습니다.");
+            // 식당 정보가 존재하지 않을 때
+            return ResponseEntity.status(404).body("식당이 존재하지 않습니다.");
+        } else if ((userId.equals("notLogin") || "USER".equals(memberRepository.findById(Long.valueOf(userId)).get().getMemberRole()))
+                & "CLOSE".equals(restaurantEntityOptional.get().getRestaurantStatus())) {
+            // 로그인을 하지 않았거나 관리자가 아닌 유저가 폐업한 식당에 접근하려 할 때
+            return ResponseEntity.status(400).body("폐업한 식당입니다.");
         } else {
             RestaurantEntity restaurantEntity = restaurantEntityOptional.get();
 
@@ -94,7 +99,6 @@ public class RestaurantService {
                     .restaurantTelNum(restaurantEntity.getRestaurantTelNum())
                     .restaurantAddress(restaurantEntity.getRestaurantAddress())
                     .restaurantOpenTime(restaurantEntity.getRestaurantOpenTime())
-                    .restaurantBreakTime(restaurantEntity.getRestaurantBreakTime())
                     .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
                     .restaurantLikeCountDto(restaurantLikeCountDto)
                     .restaurantImageDtoList(restaurantImageDtoList)
@@ -107,45 +111,50 @@ public class RestaurantService {
     }
 
     // 식당 검색 - 리뷰 많은순, 별점 순 정렬 필요, 좋아요 순 완료
-    public ResponseEntity<Page<RestaurantDto>> findRestaurantByKeyword (int page, String sort, String keyword, String city, String district, String dong) {
+    public ResponseEntity<?> findRestaurantByKeyword (int page, String sort, String keyword, String city, String district, String dong) {
         Pageable pageable;
         Page<RestaurantDto> restaurantDtoPage;
         Page<RestaurantEntity> restaurantEntityPage;
 
-        if(sort.equals("rateDesc")) { // 별점 순 정렬
-            pageable = PageRequest.of(page,10);
-            if(dong != null){ // 동 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongNameAndRate(pageable,keyword,dong);
-            } else if (district != null) { // 구 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndRate(pageable,keyword,district);
-            } else if (city != null) { // 시 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndRate(pageable, keyword, city);
-            } else { // 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRate(pageable,keyword);
-            }
-        } else if (sort.equals("like")) { // 좋아요 순 정렬
-            pageable = PageRequest.of(page,10);
-            if(dong != null){ // 동 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongNameAndLikeCountEntity_likeStatus(pageable,keyword,dong);
-            } else if (district != null) { // 구 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndLikeCountEntity_likeStatus(pageable,keyword,district);
-            } else if (city != null) { // 시 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndLikeCountEntity_likeStatus(pageable, keyword, city);
-            } else { // 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndLikeCountEntity_likeStatus(pageable,keyword);
-            }
-        } else {
-            pageable = PageRequest.of(page,10, Sort.by(Sort.Direction.DESC, "reviewEntityList.size"));
-
-            if(dong != null){ // 동 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable,keyword,dong);
-            } else if (district != null) { // 구 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(pageable,keyword,district);
-            } else if (city != null) { // 시 이름 + 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(pageable, keyword, city);
-            } else { // 키워드 검색
-                restaurantEntityPage = restaurantRepository.findByRestaurantName(pageable,keyword);
-            }
+        switch (sort) {
+            case "rateDesc":  // 별점 순 정렬
+                pageable = PageRequest.of(page, 10);
+                if (dong != null) { // 동 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongNameAndRate(pageable, keyword, dong);
+                } else if (district != null) { // 구 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndRate(pageable, keyword, district);
+                } else if (city != null) { // 시 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndRate(pageable, keyword, city);
+                } else { // 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRate(pageable, keyword);
+                }
+                break;
+            case "like":  // 좋아요 순 정렬
+                pageable = PageRequest.of(page, 10);
+                if (dong != null) { // 동 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongNameAndLikeCountEntity_likeStatus(pageable, keyword, dong);
+                } else if (district != null) { // 구 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsNameAndLikeCountEntity_likeStatus(pageable, keyword, district);
+                } else if (city != null) { // 시 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityNameAndLikeCountEntity_likeStatus(pageable, keyword, city);
+                } else { // 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndLikeCountEntity_likeStatus(pageable, keyword);
+                }
+                break;
+            case "review": // 리뷰 많은 순 정렬
+                pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "reviewEntityList.size"));
+                if (dong != null) { // 동 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable, keyword, dong);
+                } else if (district != null) { // 구 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_DistrictsName(pageable, keyword, district);
+                } else if (city != null) { // 시 이름 + 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DistrictsEntity_CityEntity_CityName(pageable, keyword, city);
+                } else { // 키워드 검색
+                    restaurantEntityPage = restaurantRepository.findByRestaurantName(pageable, keyword);
+                }
+                break;
+            default:
+                return ResponseEntity.status(404).body("잘못된 접근입니다.\n존재 하지 않는 sort");
         }
 
         restaurantDtoPage = restaurantEntityPage
@@ -159,6 +168,7 @@ public class RestaurantService {
                 .builder()
                 .restaurantId(restaurantEntity.getRestaurantId())
                 .restaurantName(restaurantEntity.getRestaurantName())
+                .restaurantStatus(restaurantEntity.getRestaurantStatus())
                 .restaurantAddress(restaurantEntity.getRestaurantAddress())
                 .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
                 .resizedImageUrl(restaurantEntity.getRestaurantImageEntity()

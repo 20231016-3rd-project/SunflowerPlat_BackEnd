@@ -41,7 +41,7 @@ public class RestaurantController {
     @Tag(name = "식당", description = "식당 관련 API")
     @Operation(summary = "식당 이름 검색, 지역 조회 및 정렬", description = "식당 관련 API")
     @GetMapping("/search")
-    public ResponseEntity<Page<RestaurantDto>> findRestaurantList (
+    public ResponseEntity<?> findRestaurantList (
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "rateDesc") String sort,
             @RequestParam(required = false) String city,

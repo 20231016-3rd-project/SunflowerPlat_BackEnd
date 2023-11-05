@@ -16,6 +16,7 @@ public class RestaurantDto {
     private String restaurantAddress;
     private String restaurantWebSite;
     private String resizedImageUrl;
+    private String restaurantStatus;
     private int likeCount;
     private int reviewCount;
     private BigDecimal avgStarRate;

@@ -1,6 +1,7 @@
 package com.hamtaro.sunflowerplate.service.admin;
 
 import com.hamtaro.sunflowerplate.dto.admin.AdminReportDto;
+import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
 import com.hamtaro.sunflowerplate.dto.review.RequestUpdateDto;
 import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuDto;
 import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuUpdateDto;
@@ -14,19 +15,20 @@ import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantMenuEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReportEntity;
 import com.hamtaro.sunflowerplate.entity.review.RequestEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewImageEntity;
+import com.hamtaro.sunflowerplate.repository.restaurant.*;
 import com.hamtaro.sunflowerplate.repository.review.ReportRepository;
 import com.hamtaro.sunflowerplate.repository.review.RequestRepository;
 import com.hamtaro.sunflowerplate.repository.review.ReviewImageRepository;
 import com.hamtaro.sunflowerplate.repository.review.ReviewRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
-import com.hamtaro.sunflowerplate.repository.restaurant.DongRepository;
-import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantImageRepository;
-import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantMenuRepository;
-import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantRepository;
 import com.hamtaro.sunflowerplate.service.restaurant.ImageService;
 import com.hamtaro.sunflowerplate.service.review.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +51,10 @@ public class AdminService {
     private final DongRepository dongRepository;
     private final RestaurantMenuRepository restaurantMenuRepository;
     private final RestaurantImageRepository restaurantImageRepository;
+    private final LikeCountRepository likeCountRepository;
     private final ImageService imageService;
 
+    @Transactional
     public ResponseEntity<?> saveRestaurant(RestaurantSaveDto restaurantSaveDto, List<MultipartFile> multipartFileList) throws IOException {
 
         // 동엔티티 설정
@@ -61,7 +65,6 @@ public class AdminService {
                 .restaurantTelNum(restaurantSaveDto.getRestaurantTelNum())
                 .restaurantAddress(restaurantSaveDto.getRestaurantAddress())
                 .restaurantOpenTime(restaurantSaveDto.getRestaurantOpenTime())
-                .restaurantBreakTime(restaurantSaveDto.getRestaurantBreakTime())
                 .restaurantWebSite(restaurantSaveDto.getRestaurantWebSite())
                 .restaurantStatus("OPEN")
                 .dongEntity(dong)
@@ -89,13 +92,11 @@ public class AdminService {
             imageService.upload(multipartFileList, dirName, restaurantEntity);
         }
 
-
         if (restaurantRepository.findById(restaurantId).isEmpty()) {
             return ResponseEntity.status(400).body("식당 등록에 실패하였습니다.");
         } else {
-            return ResponseEntity.status(200).body("식당 등록에 성공하였습니다.");
+            return ResponseEntity.status(200).body("식당 등록에 성공하였습니다.\nrestaurantId : " + restaurantId);
         }
-
     }
 
     // 식당 정보 수정
@@ -115,7 +116,6 @@ public class AdminService {
             restaurantEntity.setRestaurantTelNum(restaurantDto.getRestaurantTelNum());
             restaurantEntity.setRestaurantAddress(restaurantDto.getRestaurantAddress());
             restaurantEntity.setRestaurantOpenTime(restaurantDto.getRestaurantOpenTime());
-            restaurantEntity.setRestaurantBreakTime(restaurantDto.getRestaurantBreakTime());
             restaurantEntity.setRestaurantWebSite(restaurantDto.getRestaurantWebSite());
             restaurantEntity.setRestaurantStatus(restaurantDto.getRestaurantStatus());
             restaurantEntity.setDongEntity(dong);
@@ -223,11 +223,7 @@ public class AdminService {
         return ResponseEntity.status(200).body(reportDtoList);
     }
 
-
-    //식당 정보 수정 요청 확인 어떤값을 드려야 하는지 물어보기
     public ResponseEntity<?> adminRestaurantModifyCheck(String userId) {
-
-
         MemberEntity findByMemberId = memberRepository.findById(Long.valueOf(userId)).get();
 
         List<RequestEntity> byRequestId = requestRepository.findAll();
@@ -247,5 +243,62 @@ public class AdminService {
             requestUpdateDtoList.add(requestUpdateDto);
         }
         return ResponseEntity.status(200).body(requestUpdateDtoList);
+    }
+
+    public ResponseEntity<?> findRestaurantForAdmin(int page, String sort, String keyword, String city, String district, String dong) {
+        // 관리자 식당 리스트 조회
+        Sort sortBy = getSortByCriterion(sort);
+        if (sortBy == null) {
+            return ResponseEntity.status(404).body("잘못된 접근입니다.");
+        }
+
+        Pageable pageable = PageRequest.of(page, 10, sortBy);
+        Page<RestaurantDto> restaurantDtoPage;
+        Page<RestaurantEntity> restaurantEntityPage = searchRestaurantForAdmin(pageable, keyword, dong, district, city);
+        restaurantDtoPage = restaurantEntityPage // dto -> entity
+                .map(this::restaurantEntityToRestaurantDto);
+        return ResponseEntity.status(200).body(restaurantDtoPage);
+    }
+
+    private Page<RestaurantEntity> searchRestaurantForAdmin(Pageable pageable, String keyword, String dong, String district, String city) {
+        // 폐업 식당 포함 검색
+        if (dong != null) { // 동 이름 + 키워드 검색
+            return restaurantRepository.findByRestaurantNameAndDongNameForAdmin(pageable, keyword, dong);
+        } else if (district != null) { // 구 이름 + 키워드 검색
+            return restaurantRepository.findByRestaurantNameAndDistrictNameForAdmin(pageable, keyword, district);
+        } else if (city != null) { // 시 이름 + 키워드 검색
+            return restaurantRepository.findByRestaurantNameAndCityNameForAdmin(pageable, keyword, city);
+        } else { // 키워드 검색
+            return restaurantRepository.findByRestaurantNameForAdmin(pageable, keyword);
+        }
+    }
+
+    private Sort getSortByCriterion(String sort) { // 정렬 기준 비교
+        if ("rateDesc".equals(sort)) {
+            return Sort.by(Sort.Direction.DESC, "reviewEntity.size");
+        } else if (("latest").equals(sort)) {
+            return Sort.by(Sort.Direction.DESC,"restaurantId");
+        } else {
+            return null;
+        }
+    }
+
+    private RestaurantDto restaurantEntityToRestaurantDto(RestaurantEntity restaurantEntity) {
+        return RestaurantDto
+                .builder()
+                .restaurantId(restaurantEntity.getRestaurantId())
+                .restaurantName(restaurantEntity.getRestaurantName())
+                .restaurantStatus(restaurantEntity.getRestaurantStatus())
+                .restaurantAddress(restaurantEntity.getRestaurantAddress())
+                .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
+                .resizedImageUrl(restaurantEntity.getRestaurantImageEntity()
+                        .stream()
+                        .findFirst()
+                        .map(RestaurantImageEntity::getRestaurantResizeUrl)
+                        .orElse("null"))
+                .likeCount(likeCountRepository.countByRestaurantEntity_RestaurantId(restaurantEntity.getRestaurantId()))
+                .reviewCount(restaurantEntity.getReviewEntityList().size())
+                .avgStarRate(restaurantRepository.findStarRateByRestaurantId(restaurantEntity.getRestaurantId()))
+                .build();
     }
 }

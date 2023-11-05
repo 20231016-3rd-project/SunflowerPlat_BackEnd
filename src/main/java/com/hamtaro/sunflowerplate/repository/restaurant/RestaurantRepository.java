@@ -131,4 +131,27 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "WHERE r.restaurantId = :restaurantId")
     BigDecimal findStarRateByRestaurantId(Long restaurantId);
 
+    // 관리자용 정렬
+    // 키워드 검색
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "WHERE r.restaurantName LIKE %:keyword%")
+    Page<RestaurantEntity> findByRestaurantNameForAdmin(Pageable pageable, @Param("keyword") String keyword);
+    // 동 검색 + 키워드 검색
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "WHERE r.restaurantName LIKE %:keyword%" +
+            "AND r.dongEntity.dongName = :dong")
+    Page<RestaurantEntity> findByRestaurantNameAndDongNameForAdmin(Pageable pageable, @Param("keyword") String keyword, @Param("dong") String dong);
+
+    // 구 검색 + 키워드 검색
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "WHERE r.restaurantName LIKE %:keyword%" +
+            "AND r.dongEntity.districtsEntity.districtsName = :distirct")
+    Page<RestaurantEntity> findByRestaurantNameAndDistrictNameForAdmin(Pageable pageable, @Param("keyword") String keyword, @Param("distirct") String distirct);
+
+    // 시 검색 + 키워드 검색
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "WHERE r.restaurantName LIKE %:keyword%" +
+            "AND r.dongEntity.districtsEntity.cityEntity.cityName = :city")
+    Page<RestaurantEntity> findByRestaurantNameAndCityNameForAdmin(Pageable pageable, @Param("keyword") String keyword, @Param("city") String city);
+
 }

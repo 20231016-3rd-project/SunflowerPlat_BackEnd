@@ -13,7 +13,6 @@ public class UpdateRestaurantInfoDto {
     private String restaurantTelNum;
     private String restaurantAddress;
     private String restaurantOpenTime;
-    private String restaurantBreakTime;
     private String restaurantWebSite;
     private String restaurantStatus;
     private List<RestaurantMenuUpdateDto> restaurantMenuDtoList;

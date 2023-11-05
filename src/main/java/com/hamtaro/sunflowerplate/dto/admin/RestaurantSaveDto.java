@@ -12,11 +12,8 @@ public class RestaurantSaveDto {
     private String restaurantTelNum;
     private String restaurantAddress;
     private String restaurantOpenTime;
-    private String restaurantBreakTime;
     private String restaurantWebSite;
     private String restaurantStatus;
     private List<RestaurantMenuDto> restaurantMenuDtoList;
-//    private List<RestaurantImageDto> restaurantImageDtoList;
-
     private RestaurantAdministrativeDistrict restaurantAdministrativeDistrict;
 }
