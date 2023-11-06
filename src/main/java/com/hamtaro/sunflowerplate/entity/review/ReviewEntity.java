@@ -30,6 +30,7 @@ public class ReviewEntity {
     @Column(name = "review_star_rating", nullable = false)
     private Integer reviewStarRating;
 
+    @CreatedDate
     @Column(name = "review_at", nullable = false)
     private LocalDateTime reviewAt;
 
