@@ -238,6 +238,7 @@ public class ReviewService {
         }
     }
 
+    // restaurantId 리뷰 리턴
     public Page<ReviewReturnDto> findReviewPageByRestaurant(Long restaurantId, int page, String sort, String userId) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<ReviewEntity> reviewEntityPage;
@@ -279,6 +280,8 @@ public class ReviewService {
                 .reviewAt(reviewEntity.getReviewAt())
                 .reviewStarRating(reviewEntity.getReviewStarRating())
                 .memberId(reviewEntity.getMemberEntity().getMemberId())
+                .memberNickname(reviewEntity.getMemberEntity().getMemberNickname())
+                .memberProfilePicture(reviewEntity.getMemberEntity().getMemberProfilePicture())
                 .reviewContent(reviewEntity.getReviewContent())
                 .reviewImageDtoList(reviewImageDtoList)
                 .empathyReview(empathyButton)

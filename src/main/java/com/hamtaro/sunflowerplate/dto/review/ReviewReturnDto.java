@@ -15,6 +15,8 @@ public class ReviewReturnDto {
     private Long reviewId;
 
     private Long memberId;
+    private String memberNickname;
+    private String memberProfilePicture;
 
     private String reviewContent;
 
