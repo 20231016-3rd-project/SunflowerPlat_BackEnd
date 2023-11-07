@@ -12,7 +12,7 @@ services:
     ports:
       - '8080:8080'
 
-networks:
-  default:
-    name: service-network
-    external: true
+#networks:
+#  default:
+#    name: service-network
+#    external: true
