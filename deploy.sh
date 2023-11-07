@@ -17,25 +17,7 @@ fi
 
 echo "${AFTER_COLOR} server up(port:${AFTER_PORT})"
 
-# 2
-#for cnt in {1..10}
-#do
-#    echo "서버 응답 확인중(${cnt}/10)";
-#    UP=$(curl -s http://localhost:${AFTER_PORT}/api/check)
-#    if [ -z "${UP}" ]
-#        then
-#            sleep 10
-#            continue
-#        else
-#            break
-#    fi
-#done
-#
-#if [ $cnt -eq 10 ]
-#then
-#    echo "서버가 정상적으로 구동되지 않았습니다."
-#    exit 1
-#fi
+
 
 # 3
 sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/service-url.inc
