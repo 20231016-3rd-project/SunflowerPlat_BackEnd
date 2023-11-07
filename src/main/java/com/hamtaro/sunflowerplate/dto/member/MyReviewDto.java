@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -32,5 +33,5 @@ public class MyReviewDto {
     private List<ReviewImageDto> reviewImageDto;
 
     @Schema(description = "리뷰 작성 시간",example = "리뷰 작성 시간")
-    private LocalDate reviewAt;
+    private LocalDateTime reviewAt;
 }

@@ -30,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import java.util.HashMap;
@@ -113,7 +114,7 @@ public class ReviewService {
         ReviewEntity reviewSaveEntity = ReviewEntity.builder()
                 .reviewContent(reviewSaveDto.getReviewContent())
                 .reviewStarRating(reviewSaveDto.getReviewStarRating())
-                .reviewAt(LocalDate.now())
+                .reviewAt(LocalDateTime.now())
                 .memberEntity(memberEntity)
                 .restaurantEntity(restaurantEntity)
                 .build();
@@ -237,6 +238,7 @@ public class ReviewService {
         }
     }
 
+    // restaurantId 리뷰 리턴
     public Page<ReviewReturnDto> findReviewPageByRestaurant(Long restaurantId, int page, String sort, String userId) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<ReviewEntity> reviewEntityPage;
@@ -278,6 +280,8 @@ public class ReviewService {
                 .reviewAt(reviewEntity.getReviewAt())
                 .reviewStarRating(reviewEntity.getReviewStarRating())
                 .memberId(reviewEntity.getMemberEntity().getMemberId())
+                .memberNickname(reviewEntity.getMemberEntity().getMemberNickname())
+                .memberProfilePicture(reviewEntity.getMemberEntity().getMemberProfilePicture())
                 .reviewContent(reviewEntity.getReviewContent())
                 .reviewImageDtoList(reviewImageDtoList)
                 .empathyReview(empathyButton)

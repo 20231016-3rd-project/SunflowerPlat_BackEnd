@@ -3,9 +3,11 @@ package com.hamtaro.sunflowerplate.entity.review;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -28,8 +30,9 @@ public class ReviewEntity {
     @Column(name = "review_star_rating", nullable = false)
     private Integer reviewStarRating;
 
+    @CreatedDate
     @Column(name = "review_at", nullable = false)
-    private LocalDate reviewAt;
+    private LocalDateTime reviewAt;
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
