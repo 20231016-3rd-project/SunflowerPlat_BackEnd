@@ -163,6 +163,7 @@ public class MemberService {
                         refreshTokenRepository.save(refreshTokenEntity);
                     }
                     TokenRequestDto tokenRequestDto = TokenRequestDto.builder()
+                            .memberId(memberEntity.getMemberId())
                             .memberNickName(memberEntity.getMemberNickname())
                             .accessToken(tokenDto.getAccessToken())
                             .accessTokenExpireDate(tokenDto.getAccessTokenExpireDate())
