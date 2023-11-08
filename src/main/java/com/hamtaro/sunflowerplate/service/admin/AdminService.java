@@ -1,12 +1,9 @@
 package com.hamtaro.sunflowerplate.service.admin;
 
-import com.hamtaro.sunflowerplate.dto.admin.AdminReportDto;
+import com.hamtaro.sunflowerplate.dto.admin.*;
 import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantDto;
+import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantImageDto;
 import com.hamtaro.sunflowerplate.dto.review.RequestUpdateDto;
-import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuDto;
-import com.hamtaro.sunflowerplate.dto.admin.RestaurantMenuUpdateDto;
-import com.hamtaro.sunflowerplate.dto.admin.RestaurantSaveDto;
-import com.hamtaro.sunflowerplate.dto.admin.UpdateRestaurantInfoDto;
 import com.hamtaro.sunflowerplate.entity.address.DongEntity;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
@@ -99,12 +96,68 @@ public class AdminService {
         }
     }
 
+     // 식당 정보 수정용 get
+    public ResponseEntity<?> findRestaurantInfoForAdmin(Long restaurantId) {
+        Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findByRestaurantId(restaurantId);
+
+        if (restaurantEntityOptional.isEmpty()){
+            return ResponseEntity.status(400).body("restaurantId가 존재하지 않습니다.");
+        } else {
+            RestaurantEntity restaurantEntity = restaurantEntityOptional.get();
+            // 메뉴 리스트 불러오기
+            List<RestaurantMenuUpdateDto> restaurantMenuDtoList = new ArrayList<>();
+            for (RestaurantMenuEntity restaurantMenuEntity : restaurantEntity.getRestaurantMenuEntity()) {
+                RestaurantMenuUpdateDto restaurantMenuDto = RestaurantMenuUpdateDto
+                        .builder()
+                        .restaurantMenuId(restaurantMenuEntity.getMenuId())
+                        .restaurantMenuName(restaurantMenuEntity.getRestaurantMenuName())
+                        .restaurantMenuPrice(restaurantMenuEntity.getRestaurantMenuPrice())
+                        .build();
+                restaurantMenuDtoList.add(restaurantMenuDto);
+            }
+
+            // 이미지 불러오기
+            List<RestaurantImageDto> restaurantImageDtoList = new ArrayList<>();
+            for(RestaurantImageEntity restaurantImageEntity : restaurantEntity.getRestaurantImageEntity()){
+                RestaurantImageDto restaurantImageDto = RestaurantImageDto
+                        .builder()
+                        .restaurantOriginName(restaurantImageEntity.getRestaurantOriginName())
+                        .restaurantStoredName(restaurantImageEntity.getRestaurantStoredName())
+                        .restaurantOriginUrl(restaurantImageEntity.getRestaurantOriginUrl())
+                        .restaurantResizedStoredName(restaurantImageEntity.getRestaurantResizedStoredName())
+                        .restaurantResizeUrl(restaurantImageEntity.getRestaurantResizeUrl())
+                        .build();
+                restaurantImageDtoList.add(restaurantImageDto);
+            }
+            RestaurantAdministrativeDistrict restaurantAdministrativeDistrict = RestaurantAdministrativeDistrict.builder()
+                    .dongName(restaurantEntity.getDongEntity().getDongName())
+                    .districtsName(restaurantEntity.getDongEntity().getDistrictsEntity().getDistrictsName())
+                    .cityName(restaurantEntity.getDongEntity().getDistrictsEntity().getCityEntity().getCityName())
+                    .build();
+
+
+            UpdateRestaurantInfoDto updateRestaurantInfoDto = UpdateRestaurantInfoDto.builder()
+                    .restaurantId(restaurantId)
+                    .restaurantName(restaurantEntity.getRestaurantName())
+                    .restaurantAddress(restaurantEntity.getRestaurantAddress())
+                    .restaurantStatus(restaurantEntity.getRestaurantStatus())
+                    .restaurantAdministrativeDistrict(restaurantAdministrativeDistrict)
+                    .restaurantImageDtoList(restaurantImageDtoList)
+                    .restaurantMenuDtoList(restaurantMenuDtoList)
+                    .restaurantOpenTime(restaurantEntity.getRestaurantOpenTime())
+                    .restaurantTelNum(restaurantEntity.getRestaurantTelNum())
+                    .restaurantWebSite(restaurantEntity.getRestaurantWebSite())
+                    .build();
+            return ResponseEntity.status(200).body(updateRestaurantInfoDto);
+        }
+
+    }
     // 식당 정보 수정
     @Transactional
     public ResponseEntity<?> updateRestaurantInfo(Long restaurantId, UpdateRestaurantInfoDto restaurantDto, List<MultipartFile> multipartFilelist) {
         Optional<RestaurantEntity> restaurantEntityOptional = restaurantRepository.findById(restaurantId);
         if (restaurantEntityOptional.isEmpty()) {
-            return ResponseEntity.status(200).body("restaurantId가 존재하지 않습니다.");
+            return ResponseEntity.status(400).body("restaurantId가 존재하지 않습니다.");
         } else {
             RestaurantEntity restaurantEntity = restaurantEntityOptional.get();
 
@@ -167,7 +220,7 @@ public class AdminService {
             // 변경된 내용을 저장
             restaurantRepository.save(restaurantEntity);
 
-            return ResponseEntity.status(200).body("식당 정보 및 메뉴 엔티티가 업데이트되었습니다.");
+            return ResponseEntity.status(200).body("식당 정보 및 메뉴 엔티티가 업데이트되었습니다.\nrestaurantId:" +  restaurantId);
 
         }
     }
@@ -301,4 +354,5 @@ public class AdminService {
                 .avgStarRate(restaurantRepository.findStarRateByRestaurantId(restaurantEntity.getRestaurantId()))
                 .build();
     }
+
 }

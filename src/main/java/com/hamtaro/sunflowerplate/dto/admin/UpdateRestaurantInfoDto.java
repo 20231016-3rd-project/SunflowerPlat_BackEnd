@@ -1,5 +1,6 @@
 package com.hamtaro.sunflowerplate.dto.admin;
 
+import com.hamtaro.sunflowerplate.dto.restaurant.RestaurantImageDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,5 +17,6 @@ public class UpdateRestaurantInfoDto {
     private String restaurantWebSite;
     private String restaurantStatus;
     private List<RestaurantMenuUpdateDto> restaurantMenuDtoList;
+    private List<RestaurantImageDto> restaurantImageDtoList;
     private RestaurantAdministrativeDistrict restaurantAdministrativeDistrict;
 }
