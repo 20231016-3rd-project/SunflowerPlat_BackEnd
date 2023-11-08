@@ -82,11 +82,23 @@ public class AdminController {
     public ResponseEntity<?> updateRestaurantInfo(HttpServletRequest request,
                                                   @PathVariable Long restaurantId,
                                                   @RequestPart(value = "data") UpdateRestaurantInfoDto restaurantDto,
-                                                  @RequestPart(name = "file") List<MultipartFile> multipartFilelist) throws IOException {
+                                                  @RequestPart(name = "file", required = false) List<MultipartFile> multipartFilelist) throws IOException {
         String header = request.getHeader(tokenProvider.loginAccessToken);
         String userId = tokenProvider.getUserPk(header);
         return adminService.updateRestaurantInfo(restaurantId, restaurantDto, multipartFilelist);
     }
+
+    @Tag(name = "관리자", description = "관리자 관련 API")
+    @Operation(summary = "식당 정보 수정", description = "관리자 관련 API")
+    // 식당 정보 수정
+    @GetMapping("/restaurant/{restaurantId}")
+    public ResponseEntity<?> getRestaurantInfoForAdmin(HttpServletRequest request,
+                                                  @PathVariable Long restaurantId ) throws IOException {
+        String header = request.getHeader(tokenProvider.loginAccessToken);
+        String userId = tokenProvider.getUserPk(header);
+        return adminService.findRestaurantInfoForAdmin(restaurantId);
+    }
+
 
     @Tag(name = "관리자", description = "관리자 관련 API")
     @Operation(summary = "폐업 포함 식당 이름 검색, 지역 조회 및 정렬", description = "식당 관련 API")
