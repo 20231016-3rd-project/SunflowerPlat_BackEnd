@@ -12,6 +12,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class TokenRequestDto {
 
+    @Schema(description = "회원 ID")
+    private Long memberId;
     @Schema(description = "회원 닉네임")
     private String memberNickName;
     @Schema(description = "액세스 토큰")
