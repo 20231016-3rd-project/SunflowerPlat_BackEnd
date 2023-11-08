@@ -17,6 +17,7 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     //최신순
     @Query( "SELECT r FROM ReviewEntity r" +
             " WHERE r.restaurantEntity.restaurantId = :restaurantId" +
+            " AND r.memberEntity.memberState = true" +
             " ORDER BY r.reviewAt desc ")
     Page<ReviewEntity> findReviewEntityByReviewIdAndAndReviewAt(Pageable pageable,Long restaurantId);
 
@@ -24,6 +25,7 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     @Query("SELECT r FROM ReviewEntity r "+
             " LEFT JOIN EmpathyEntity e ON r.reviewId = e.reviewEntity.reviewId" +
             " WHERE r.restaurantEntity.restaurantId = :restaurantId" +
+            " AND r.memberEntity.memberState = true" +
             " GROUP BY r.reviewId" +
             " ORDER BY SUM(CASE WHEN e.empathyState = true THEN 1 ELSE 0 END) DESC")
     Page<ReviewEntity> findReviewEntityByReviewIdAndEmpathyEntity(Pageable pageable, Long restaurantId);
