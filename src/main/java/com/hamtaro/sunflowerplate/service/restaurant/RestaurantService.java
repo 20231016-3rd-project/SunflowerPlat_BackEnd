@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -164,6 +165,7 @@ public class RestaurantService {
 
     // Entity -> Dto
     private RestaurantDto restaurantEntityToRestaurantDto(RestaurantEntity restaurantEntity){
+
         return RestaurantDto
                 .builder()
                 .restaurantId(restaurantEntity.getRestaurantId())
@@ -182,4 +184,41 @@ public class RestaurantService {
                 .build();
     }
 
+    // 베스트 식당 리스트
+    public ResponseEntity<?> findBestRestaurantList(String address, String menu) {
+        List<RestaurantEntity> restaurantEntityList;
+        List<RestaurantDto> restaurantDtoList;
+        if("홍대연남".equals(address)){
+            restaurantEntityList = restaurantRepository.findRestaurantAtHongdae(PageRequest.of(0,10));
+            restaurantDtoList = restaurantEntityList.stream().map(this::restaurantEntityToRestaurantDto).collect(Collectors.toList());
+            return ResponseEntity.status(200).body(restaurantDtoList);
+        } else if ("신촌이대".equals(address)) {
+            restaurantEntityList = restaurantRepository.findRestaurantAtSinchon(PageRequest.of(0,10));
+            restaurantDtoList = restaurantEntityList.stream().map(this::restaurantEntityToRestaurantDto).collect(Collectors.toList());
+            return ResponseEntity.status(200).body(restaurantDtoList);
+        } else if ("안국".equals(address)) {
+            restaurantEntityList = restaurantRepository.findRestaurantAtAnguk(PageRequest.of(0,10));
+            restaurantDtoList = restaurantEntityList.stream().map(this::restaurantEntityToRestaurantDto).collect(Collectors.toList());
+            return ResponseEntity.status(200).body(restaurantDtoList);
+        } else if ("라멘".equals(menu)) {
+            restaurantEntityList = restaurantRepository.findBestRamenRestaurant(PageRequest.of(0,10));
+            restaurantDtoList = restaurantEntityList.stream().map(this::restaurantEntityToRestaurantDto).collect(Collectors.toList());
+            return ResponseEntity.status(200).body(restaurantDtoList);
+        } else if ("피자".equals(menu)) {
+            restaurantEntityList = restaurantRepository.findBestPizzaRestaurant(PageRequest.of(0,10));
+            restaurantDtoList = restaurantEntityList.stream().map(this::restaurantEntityToRestaurantDto).collect(Collectors.toList());
+            return ResponseEntity.status(200).body(restaurantDtoList);
+        } else if ("파스타".equals(menu)) {
+            restaurantEntityList = restaurantRepository.findBestPastaRestaurant(PageRequest.of(0,10));
+            restaurantDtoList = restaurantEntityList.stream().map(this::restaurantEntityToRestaurantDto).collect(Collectors.toList());
+            return ResponseEntity.status(200).body(restaurantDtoList);
+        } else if ("떡볶이".equals(menu)) {
+            restaurantEntityList = restaurantRepository.findBestTteokbokkiRestaurant(PageRequest.of(0,10));
+            restaurantDtoList = restaurantEntityList.stream().map(this::restaurantEntityToRestaurantDto).collect(Collectors.toList());
+            return ResponseEntity.status(200).body(restaurantDtoList);
+        }
+        else {
+            return ResponseEntity.status(400).body("잘못된 접근 경로입니다.");
+        }
+    }
 }
