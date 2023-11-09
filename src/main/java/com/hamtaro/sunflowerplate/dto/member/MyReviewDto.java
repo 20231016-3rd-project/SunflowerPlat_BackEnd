@@ -17,6 +17,9 @@ import java.util.List;
 @Builder
 public class MyReviewDto {
 
+    @Schema(description = "리뷰ID",example = "리뷰ID")
+    private Long reviewId;
+
     @Schema(description = "레스토랑ID",example = "레스토랑ID")
     private Long restaurantId;
 

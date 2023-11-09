@@ -8,6 +8,7 @@ import com.hamtaro.sunflowerplate.dto.member.MyReviewDto;
 import com.hamtaro.sunflowerplate.dto.member.UpdateReviewDto;
 import com.hamtaro.sunflowerplate.dto.member.UpdateReviewImageDto;
 import com.hamtaro.sunflowerplate.dto.review.ReviewImageDto;
+import com.hamtaro.sunflowerplate.dto.review.ReviewReturnDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
 import com.hamtaro.sunflowerplate.entity.review.EmpathyEntity;
 import com.hamtaro.sunflowerplate.entity.review.LikeCountEntity;
@@ -72,6 +73,7 @@ public class MyPageService {
             }
             MyReviewDto myReviewDto =
                     MyReviewDto.builder()
+                            .reviewId(reviewEntity.getReviewId())
                             .restaurantId(reviewEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
                             .restaurantName(reviewEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
                             .reviewContent(reviewEntity.getReviewContent()) //리뷰내용
@@ -278,17 +280,36 @@ public class MyPageService {
                             .build();
             reviewImageDtoList.add(reviewImageDto);
         }
+        boolean empathyReview = false;
+        for (EmpathyEntity empathyEntity : responseEntity.getEmpathyEntityList()) {
+            if(empathyEntity.getMemberEntity().getMemberId().equals(responseEntity.getMemberEntity().getMemberId())){
+               empathyReview = empathyEntity.getEmpathyState();
+               break;
+            }
+        }
 
-        MyReviewDto myReviewDto =
-                MyReviewDto.builder()
-                        .restaurantId(responseEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
-                        .restaurantName(responseEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
-                        .reviewContent(responseEntity.getReviewContent()) //리뷰내용
-                        .reviewStarRating(responseEntity.getReviewStarRating()) //리뷰별점
-                        .reviewImageDto(reviewImageDtoList)
-                        .reviewAt(responseEntity.getReviewAt()) // 리뷰작성시간
-                        .build();
-        return ResponseEntity.status(200).body(myReviewDto);
+        ReviewReturnDto reviewReturnDto = ReviewReturnDto.builder()
+                .reviewId(responseEntity.getReviewId())
+                .memberId(responseEntity.getMemberEntity().getMemberId())
+                .memberNickname(responseEntity.getMemberEntity().getMemberNickname())
+                .memberProfilePicture(responseEntity.getMemberEntity().getMemberProfilePicture())
+                .reviewContent(responseEntity.getReviewContent())
+                .reviewStarRating(responseEntity.getReviewStarRating())
+                .reviewAt(responseEntity.getReviewAt())
+                .reviewImageDtoList(reviewImageDtoList)
+                .reviewEmpathyCount(responseEntity.getEmpathyEntityList().size())
+                .empathyReview(empathyReview)
+                .build();
+//        MyReviewDto myReviewDto =
+//                MyReviewDto.builder()
+//                        .restaurantId(responseEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
+//                        .restaurantName(responseEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
+//                        .reviewContent(responseEntity.getReviewContent()) //리뷰내용
+//                        .reviewStarRating(responseEntity.getReviewStarRating()) //리뷰별점
+//                        .reviewImageDto(reviewImageDtoList)
+//                        .reviewAt(responseEntity.getReviewAt()) // 리뷰작성시간
+//                        .build();
+        return ResponseEntity.status(200).body(reviewReturnDto);
 
     }
 
