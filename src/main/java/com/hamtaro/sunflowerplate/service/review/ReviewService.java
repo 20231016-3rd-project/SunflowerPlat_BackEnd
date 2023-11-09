@@ -185,8 +185,11 @@ public class ReviewService {
 
             ReviewReturnDto reviewReturnDto = ReviewReturnDto.builder()
                     .reviewId(reviewId)
+                    .memberProfilePicture(reviewEntity.getMemberEntity().getMemberProfilePicture())
+                    .memberNickname(reviewEntity.getMemberEntity().getMemberNickname())
                     .reviewContent(reviewEntity.getReviewContent())
                     .reviewStarRating(reviewEntity.getReviewStarRating())
+                    .reviewEmpathyCount(0)
                     .reviewAt(reviewEntity.getReviewAt())
                     .memberId(reviewEntity.getMemberEntity().getMemberId())
                     .reviewImageDtoList(reviewImageDtoList)
@@ -195,12 +198,13 @@ public class ReviewService {
         } else {
             ReviewReturnDto reviewReturnDto = ReviewReturnDto.builder()
                     .reviewId(reviewId)
+                    .memberProfilePicture(reviewEntity.getMemberEntity().getMemberProfilePicture())
+                    .memberNickname(reviewEntity.getMemberEntity().getMemberNickname())
                     .reviewContent(reviewEntity.getReviewContent())
                     .reviewStarRating(reviewEntity.getReviewStarRating())
+                    .reviewEmpathyCount(0)
                     .reviewAt(reviewEntity.getReviewAt())
                     .memberId(reviewEntity.getMemberEntity().getMemberId())
-                    .reviewEmpathyCount(0)
-                    .empathyReview(false)
                     .build();
             return ResponseEntity.status(200).body(reviewReturnDto);
         }
