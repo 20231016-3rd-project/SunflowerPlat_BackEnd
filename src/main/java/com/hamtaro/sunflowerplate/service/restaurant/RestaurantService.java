@@ -81,7 +81,11 @@ public class RestaurantService {
                 likeButton = false;
             } else {
                 Long memberId = Long.valueOf(userId);
-                likeButton = likeCountRepository.findByMemberEntityAndRestaurantEntity(memberId, restaurantId).isPresent();
+                if(likeCountRepository.findByMemberEntityAndRestaurantEntity(memberId, restaurantId).isPresent()){
+                    likeButton = likeCountRepository.findByMemberEntityAndRestaurantEntity(memberId, restaurantId).get().isLikeStatus();
+                } else {
+                    likeButton = false;
+                }
             }
 
             // 좋아요 불러오기
@@ -159,7 +163,7 @@ public class RestaurantService {
         }
 
         restaurantDtoPage = restaurantEntityPage
-                .map(this::restaurantEntityToRestaurantDto);
+                .map(restaurantEntity -> restaurantEntityToRestaurantDto(restaurantEntity));
         return ResponseEntity.status(200).body(restaurantDtoPage);
     }
 

@@ -272,7 +272,11 @@ public class ReviewService {
             empathyButton = false;
         } else {
             Long memberId = Long.valueOf(userId);
-            empathyButton = empathyRepository.findByMemberEntityAndReviewEntity(memberRepository.findById(memberId).get(), reviewEntity).isPresent();
+            if(empathyRepository.findByMemberEntityAndReviewEntity(memberRepository.findById(memberId).get(), reviewEntity).isPresent()){
+                empathyButton = empathyRepository.findByMemberEntityAndReviewEntity(memberRepository.findById(memberId).get(), reviewEntity).get().getEmpathyState();
+            } else {
+                empathyButton = false;
+            }
         }
 
         return ReviewReturnDto.builder()
