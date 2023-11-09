@@ -13,7 +13,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@SQLDelete(sql = " update empathy set empathy_state = true WHERE empathy_id = ? ")
 @Table(name = "empathy")
 public class EmpathyEntity {
     //좋아요
