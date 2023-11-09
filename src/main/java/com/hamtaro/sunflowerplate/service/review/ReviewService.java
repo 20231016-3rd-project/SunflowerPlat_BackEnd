@@ -190,6 +190,7 @@ public class ReviewService {
                     .reviewContent(reviewEntity.getReviewContent())
                     .reviewStarRating(reviewEntity.getReviewStarRating())
                     .reviewEmpathyCount(0)
+                    .empathyReview(false)
                     .reviewAt(reviewEntity.getReviewAt())
                     .memberId(reviewEntity.getMemberEntity().getMemberId())
                     .reviewImageDtoList(reviewImageDtoList)
@@ -203,6 +204,7 @@ public class ReviewService {
                     .reviewContent(reviewEntity.getReviewContent())
                     .reviewStarRating(reviewEntity.getReviewStarRating())
                     .reviewEmpathyCount(0)
+                    .empathyReview(false)
                     .reviewAt(reviewEntity.getReviewAt())
                     .memberId(reviewEntity.getMemberEntity().getMemberId())
                     .build();
