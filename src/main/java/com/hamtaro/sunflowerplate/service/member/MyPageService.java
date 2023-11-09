@@ -95,7 +95,6 @@ public class MyPageService {
                     reviewService.deleteS3Image(reviewImageEntity.getReviewStoredName());
                     reviewService.deleteS3Image(reviewImageEntity.getReviewResizeStoredName());
                 }
-                Optional<EmpathyEntity> byReviewEntityReviewId = empathyRepository.findByReviewEntityReviewId(reviewId);
                 reviewRepository.deleteById(reviewId);
                 return ResponseEntity.status(200).body("리뷰삭제");
             } else {
