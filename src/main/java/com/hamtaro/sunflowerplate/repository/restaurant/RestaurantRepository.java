@@ -2,12 +2,14 @@ package com.hamtaro.sunflowerplate.repository.restaurant;
 
 import com.hamtaro.sunflowerplate.entity.restaurant.RestaurantEntity;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Long> {
@@ -153,5 +155,90 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "WHERE r.restaurantName LIKE %:keyword%" +
             "AND r.dongEntity.districtsEntity.cityEntity.cityName = :city")
     Page<RestaurantEntity> findByRestaurantNameAndCityNameForAdmin(Pageable pageable, @Param("keyword") String keyword, @Param("city") String city);
+
+
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
+            "WHERE r.restaurantStatus = 'OPEN' " +
+//            "AND r.reviewEntityList.size > 10 " +
+            "AND r.dongEntity.dongName = '서교동' " +
+            "OR r.dongEntity.dongName = '동교동' " +
+            "OR r.dongEntity.dongName = '연남동' " +
+            "GROUP BY r " +
+            "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
+    List<RestaurantEntity> findRestaurantAtHongdae(Pageable pageable);
+
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
+            "WHERE r.restaurantStatus = 'OPEN' " +
+//            "AND r.reviewEntityList.size > 10 " +
+            "AND r.dongEntity.dongName = '창천동' " +
+            "OR r.dongEntity.dongName = '신촌동' " +
+            "OR r.dongEntity.dongName = '노고산동' " +
+            "OR r.dongEntity.dongName = '대현동' " +
+            "GROUP BY r " +
+            "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
+    List<RestaurantEntity> findRestaurantAtSinchon(Pageable pageable);
+
+    // 메인 베스트 식당 조회
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
+            "WHERE r.restaurantStatus = 'OPEN' " +
+//            "AND r.reviewEntityList.size > 10 " +
+            "AND r.dongEntity.dongName = '안국동' " +
+            "OR r.dongEntity.dongName = '재동' " +
+            "OR r.dongEntity.dongName = '소격동' " +
+            "OR r.dongEntity.dongName = '송현동' " +
+            "OR r.dongEntity.dongName = '계동' " +
+            "OR r.dongEntity.dongName = '사간동' " +
+            "GROUP BY r " +
+            "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
+    List<RestaurantEntity> findRestaurantAtAnguk(Pageable pageable);
+
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "LEFT JOIN RestaurantMenuEntity menu ON r.restaurantId = menu.restaurantEntity.restaurantId " +
+            "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
+            "WHERE r.restaurantStatus = 'OPEN' " +
+            "AND r.reviewEntityList.size > 10 "+
+            "AND menu.restaurantMenuName LIKE '%라멘%' " +
+            "GROUP BY r " +
+            "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
+    List<RestaurantEntity> findBestRamenRestaurant(Pageable pageable);
+
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "LEFT JOIN RestaurantMenuEntity menu ON r.restaurantId = menu.restaurantEntity.restaurantId " +
+            "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
+            "WHERE r.restaurantStatus = 'OPEN' " +
+            "AND r.reviewEntityList.size > 10 "+
+            "AND menu.restaurantMenuName LIKE '%피자%' OR menu.restaurantMenuName LIKE '%pizza%'" +
+            "OR menu.restaurantMenuName LIKE '%마르게리따%' OR menu.restaurantMenuName LIKE '%마리나라%' " +
+            "GROUP BY r " +
+            "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
+    List<RestaurantEntity> findBestPizzaRestaurant(Pageable pageable);
+
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "LEFT JOIN RestaurantMenuEntity menu ON r.restaurantId = menu.restaurantEntity.restaurantId " +
+            "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
+            "WHERE r.restaurantStatus = 'OPEN' " +
+            "AND r.reviewEntityList.size > 10 "+
+            "AND menu.restaurantMenuName LIKE '%파스타%' OR menu.restaurantMenuName LIKE '%pasta%' " +
+            "OR menu.restaurantMenuName LIKE '%알리오%' OR menu.restaurantMenuName LIKE '%뇨끼%' " +
+            "OR menu.restaurantMenuName LIKE '%까르보나라%' OR menu.restaurantMenuName LIKE '%스파게티%' " +
+            "OR menu.restaurantMenuName LIKE '%라자냐%' OR menu.restaurantMenuName LIKE '%링귀니%' " +
+            "OR menu.restaurantMenuName LIKE '%나폴리탄%' " +
+            "GROUP BY r " +
+            "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
+    List<RestaurantEntity> findBestPastaRestaurant(Pageable pageable);
+
+    @Query("SELECT r FROM RestaurantEntity r " +
+            "LEFT JOIN RestaurantMenuEntity menu ON r.restaurantId = menu.restaurantEntity.restaurantId " +
+            "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
+//            "WHERE r.reviewEntityList.size > 10 "+
+            "WHERE menu.restaurantMenuName LIKE '%떡볶이%' " +
+            "AND r.restaurantStatus = 'OPEN' " +
+            "GROUP BY r " +
+            "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
+    List<RestaurantEntity> findBestTteokbokkiRestaurant(Pageable pageable);
+
 
 }

@@ -50,4 +50,15 @@ public class RestaurantController {
             @RequestParam(defaultValue = "1") int page ){
         return restaurantService.findRestaurantByKeyword(page-1, sort, keyword, city, district, dong);
     }
+
+    @Tag(name = "식당", description = "식당 관련 API")
+    @Operation(summary = "식당 베스트 조회", description = "식당 관련 API")
+    @GetMapping("/best")
+    public ResponseEntity<?> bestRestaurantList (
+            @RequestParam(defaultValue = "") String address,
+            @RequestParam(required = false) String menu){
+        return restaurantService.findBestRestaurantList(address,menu);
+    }
+
+
 }
