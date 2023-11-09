@@ -155,47 +155,49 @@ public class MyPageService {
                 findReview.setReviewContent(updateReviewDto.getReviewContent());
                 Long saveReviewId = reviewRepository.save(findReview).getReviewId();
                 ReviewEntity updateReview = reviewRepository.findById(saveReviewId).get();
-                for (MultipartFile multipartFile : imageFile) {
-                    String fileName = multipartFile.getOriginalFilename(); //원본 파일
-                    try {
-                        //이미지 객체 생성
-                        ObjectMetadata objectMetadata = new ObjectMetadata();
-                        objectMetadata.setContentType(multipartFile.getContentType());
-                        objectMetadata.setContentLength(multipartFile.getSize());
+                if(imageFile.size()>1) {
+                    for (MultipartFile multipartFile : imageFile) {
+                        String fileName = multipartFile.getOriginalFilename(); //원본 파일
+                        try {
+                            //이미지 객체 생성
+                            ObjectMetadata objectMetadata = new ObjectMetadata();
+                            objectMetadata.setContentType(multipartFile.getContentType());
+                            objectMetadata.setContentLength(multipartFile.getSize());
 
-                        //원본 파일 저장
-                        String storedName = createFileName(fileName);
-                        amazonS3Client.putObject(new PutObjectRequest(bucketName, storedName, multipartFile.getInputStream(), objectMetadata));
-                        String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
-                        System.out.println("Original Image URL:" + accessUrl);
+                            //원본 파일 저장
+                            String storedName = createFileName(fileName);
+                            amazonS3Client.putObject(new PutObjectRequest(bucketName, storedName, multipartFile.getInputStream(), objectMetadata));
+                            String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
+                            System.out.println("Original Image URL:" + accessUrl);
 
-                        //리사이징 파일 저장
-                        String resizeName = "resized_" + storedName;
-                        File resizedImageFile = resizeImage(multipartFile);
-                        amazonS3Client.putObject(bucketName, resizeName, resizedImageFile);
-                        String resizeUrl = amazonS3Client.getUrl(bucketName, resizeName).toString();
+                            //리사이징 파일 저장
+                            String resizeName = "resized_" + storedName;
+                            File resizedImageFile = resizeImage(multipartFile);
+                            amazonS3Client.putObject(bucketName, resizeName, resizedImageFile);
+                            String resizeUrl = amazonS3Client.getUrl(bucketName, resizeName).toString();
 
-                        //이미지 저장
-                        reviewImageRepository.save(ReviewImageEntity.builder()
-                                .reviewOriginName(fileName)
-                                .reviewStoredName(storedName)
-                                .reviewResizeStoredName(resizeName)
-                                .reviewOriginUrl(accessUrl)
-                                .reviewResizeUrl(resizeUrl)
-                                .reviewEntity(updateReview)
-                                .build());
+                            //이미지 저장
+                            reviewImageRepository.save(ReviewImageEntity.builder()
+                                    .reviewOriginName(fileName)
+                                    .reviewStoredName(storedName)
+                                    .reviewResizeStoredName(resizeName)
+                                    .reviewOriginUrl(accessUrl)
+                                    .reviewResizeUrl(resizeUrl)
+                                    .reviewEntity(updateReview)
+                                    .build());
 
-                        if (resizedImageFile != null && resizedImageFile.exists()) {
-                            if (resizedImageFile.delete()) {
-                                log.info("이미지 삭제됨");
+                            if (resizedImageFile != null && resizedImageFile.exists()) {
+                                if (resizedImageFile.delete()) {
+                                    log.info("이미지 삭제됨");
+                                } else {
+                                    log.info("이미지 삭제");
+                                }
                             } else {
-                                log.info("이미지 삭제");
+                                log.info("이미지파일 없음");
                             }
-                        } else {
-                            log.info("이미지파일 없음");
+                        } catch (IOException e) {
+                            throw new RuntimeException("이미지 업로드에 실패했습니다.");
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException("이미지 업로드에 실패했습니다.");
                     }
                 }
             } else if (updateReviewDto.getImageDtoList().size() > 0) {
