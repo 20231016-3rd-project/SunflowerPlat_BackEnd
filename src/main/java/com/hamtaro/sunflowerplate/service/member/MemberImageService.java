@@ -53,7 +53,8 @@ public class MemberImageService {
         return UUID.randomUUID() + "." + extractExtension(originName);
     }
 
-    private File resizeImage(MultipartFile originalImage) throws IOException {
+    private File
+    resizeImage(MultipartFile originalImage) throws IOException {
         File resizedFile = new File("resized_" + originalImage.getOriginalFilename());
         Thumbnails.of(originalImage.getInputStream())
                 .size(300, 300)
