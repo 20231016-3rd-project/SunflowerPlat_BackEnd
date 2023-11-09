@@ -117,13 +117,11 @@ public class RestaurantService {
 
     // 식당 검색 - 리뷰 많은순, 별점 순 정렬 필요, 좋아요 순 완료
     public ResponseEntity<?> findRestaurantByKeyword (int page, String sort, String keyword, String city, String district, String dong) {
-        Pageable pageable;
         Page<RestaurantDto> restaurantDtoPage;
         Page<RestaurantEntity> restaurantEntityPage;
-
+        Pageable pageable = PageRequest.of(page, 10);
         switch (sort) {
             case "rateDesc":  // 별점 순 정렬
-                pageable = PageRequest.of(page, 10);
                 if (dong != null) { // 동 이름 + 키워드 검색
                     restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongNameAndRate(pageable, keyword, dong);
                 } else if (district != null) { // 구 이름 + 키워드 검색
@@ -135,7 +133,6 @@ public class RestaurantService {
                 }
                 break;
             case "like":  // 좋아요 순 정렬
-                pageable = PageRequest.of(page, 10);
                 if (dong != null) { // 동 이름 + 키워드 검색
                     restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongNameAndLikeCountEntity_likeStatus(pageable, keyword, dong);
                 } else if (district != null) { // 구 이름 + 키워드 검색
@@ -147,7 +144,6 @@ public class RestaurantService {
                 }
                 break;
             case "review": // 리뷰 많은 순 정렬
-                pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "reviewEntityList.size"));
                 if (dong != null) { // 동 이름 + 키워드 검색
                     restaurantEntityPage = restaurantRepository.findByRestaurantNameAndDongEntity_DongName(pageable, keyword, dong);
                 } else if (district != null) { // 구 이름 + 키워드 검색
@@ -163,7 +159,7 @@ public class RestaurantService {
         }
 
         restaurantDtoPage = restaurantEntityPage
-                .map(restaurantEntity -> restaurantEntityToRestaurantDto(restaurantEntity));
+                .map(this::restaurantEntityToRestaurantDto);
         return ResponseEntity.status(200).body(restaurantDtoPage);
     }
 
