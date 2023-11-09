@@ -199,7 +199,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "LEFT JOIN RestaurantMenuEntity menu ON r.restaurantId = menu.restaurantEntity.restaurantId " +
             "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
             "WHERE r.restaurantStatus = 'OPEN' " +
-            "AND r.reviewEntityList.size > 10 "+
+//            "AND r.reviewEntityList.size > 10 "+
             "AND menu.restaurantMenuName LIKE '%라멘%' " +
             "GROUP BY r " +
             "ORDER BY COALESCE(AVG(review.reviewStarRating),0) DESC ")
@@ -209,7 +209,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "LEFT JOIN RestaurantMenuEntity menu ON r.restaurantId = menu.restaurantEntity.restaurantId " +
             "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
             "WHERE r.restaurantStatus = 'OPEN' " +
-            "AND r.reviewEntityList.size > 10 "+
+//            "AND r.reviewEntityList.size > 10 "+
             "AND menu.restaurantMenuName LIKE '%피자%' OR menu.restaurantMenuName LIKE '%pizza%'" +
             "OR menu.restaurantMenuName LIKE '%마르게리따%' OR menu.restaurantMenuName LIKE '%마리나라%' " +
             "GROUP BY r " +
@@ -220,7 +220,7 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity,Lon
             "LEFT JOIN RestaurantMenuEntity menu ON r.restaurantId = menu.restaurantEntity.restaurantId " +
             "LEFT JOIN ReviewEntity review ON r.restaurantId = review.restaurantEntity.restaurantId " +
             "WHERE r.restaurantStatus = 'OPEN' " +
-            "AND r.reviewEntityList.size > 10 "+
+//            "AND r.reviewEntityList.size > 10 "+
             "AND menu.restaurantMenuName LIKE '%파스타%' OR menu.restaurantMenuName LIKE '%pasta%' " +
             "OR menu.restaurantMenuName LIKE '%알리오%' OR menu.restaurantMenuName LIKE '%뇨끼%' " +
             "OR menu.restaurantMenuName LIKE '%까르보나라%' OR menu.restaurantMenuName LIKE '%스파게티%' " +
