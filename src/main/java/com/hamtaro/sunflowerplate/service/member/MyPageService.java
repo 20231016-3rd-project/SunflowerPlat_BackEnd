@@ -9,12 +9,14 @@ import com.hamtaro.sunflowerplate.dto.member.UpdateReviewDto;
 import com.hamtaro.sunflowerplate.dto.member.UpdateReviewImageDto;
 import com.hamtaro.sunflowerplate.dto.review.ReviewImageDto;
 import com.hamtaro.sunflowerplate.entity.member.MemberEntity;
+import com.hamtaro.sunflowerplate.entity.review.EmpathyEntity;
 import com.hamtaro.sunflowerplate.entity.review.LikeCountEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewEntity;
 import com.hamtaro.sunflowerplate.entity.review.ReviewImageEntity;
 import com.hamtaro.sunflowerplate.repository.restaurant.LikeCountRepository;
 import com.hamtaro.sunflowerplate.repository.member.MemberRepository;
 import com.hamtaro.sunflowerplate.repository.restaurant.RestaurantRepository;
+import com.hamtaro.sunflowerplate.repository.review.EmpathyRepository;
 import com.hamtaro.sunflowerplate.repository.review.ReviewImageRepository;
 import com.hamtaro.sunflowerplate.repository.review.ReviewRepository;
 import com.hamtaro.sunflowerplate.service.review.ReviewService;
@@ -27,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
 
 import javax.transaction.Transactional;
 import java.io.File;
@@ -44,6 +47,7 @@ public class MyPageService {
     private final ReviewService reviewService;
     private final LikeCountRepository likeCountRepository;
     private final RestaurantRepository restaurantRepository;
+    private final EmpathyRepository empathyRepository;
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.review-img}")
     private String bucketName;
@@ -58,28 +62,29 @@ public class MyPageService {
             for (ReviewImageEntity reviewImageEntity : reviewEntity.getReviewImageEntityList()) {
                 ReviewImageDto reviewImageDto =
                         ReviewImageDto.builder()
-                                      .reviewImageId(reviewImageEntity.getReviewImageId())
-                                      .reviewOriginName(reviewImageEntity.getReviewOriginName())
-                                      .reviewOriginUrl(reviewImageEntity.getReviewOriginUrl())
-                                      .reviewResizeUrl(reviewImageEntity.getReviewResizeUrl())
-                                      .reviewStoredName(reviewImageEntity.getReviewStoredName())
-                                      .build();
+                                .reviewImageId(reviewImageEntity.getReviewImageId())
+                                .reviewOriginName(reviewImageEntity.getReviewOriginName())
+                                .reviewOriginUrl(reviewImageEntity.getReviewOriginUrl())
+                                .reviewResizeUrl(reviewImageEntity.getReviewResizeUrl())
+                                .reviewStoredName(reviewImageEntity.getReviewStoredName())
+                                .build();
                 reviewImageDtoList.add(reviewImageDto);
             }
             MyReviewDto myReviewDto =
                     MyReviewDto.builder()
-                               .restaurantId(reviewEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
-                               .restaurantName(reviewEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
-                               .reviewContent(reviewEntity.getReviewContent()) //리뷰내용
-                               .reviewStarRating(reviewEntity.getReviewStarRating()) //리뷰별점
-                               .reviewImageDto(reviewImageDtoList)
-                               .reviewAt(reviewEntity.getReviewAt()) // 리뷰작성시간
-                               .build();
+                            .restaurantId(reviewEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
+                            .restaurantName(reviewEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
+                            .reviewContent(reviewEntity.getReviewContent()) //리뷰내용
+                            .reviewStarRating(reviewEntity.getReviewStarRating()) //리뷰별점
+                            .reviewImageDto(reviewImageDtoList)
+                            .reviewAt(reviewEntity.getReviewAt()) // 리뷰작성시간
+                            .build();
             myReviewDtoList.add(myReviewDto);
         }
         return ResponseEntity.status(200).body(myReviewDtoList);
     }
 
+    @Transactional
     public ResponseEntity<?> deleteMyReview(Long reviewId, String userId) {
         Optional<List<ReviewImageEntity>> reviewImageId = reviewImageRepository.findReviewImageEntityByReviewEntity_ReviewId(reviewId);
         ReviewEntity findReview = reviewRepository.findById(reviewId).get();
@@ -90,13 +95,14 @@ public class MyPageService {
                     reviewService.deleteS3Image(reviewImageEntity.getReviewStoredName());
                     reviewService.deleteS3Image(reviewImageEntity.getReviewResizeStoredName());
                 }
+                Optional<EmpathyEntity> byReviewEntityReviewId = empathyRepository.findByReviewEntityReviewId(reviewId);
                 reviewRepository.deleteById(reviewId);
                 return ResponseEntity.status(200).body("리뷰삭제");
             } else {
                 reviewRepository.deleteById(reviewId);
                 return ResponseEntity.status(200).body("리뷰삭제");
             }
-        }else{
+        } else {
             Map<String, String> response = new HashMap<>();
             response.put("message", "권한없음");
             return ResponseEntity.status(403).body(response);
@@ -106,8 +112,8 @@ public class MyPageService {
     private File resizeImage(MultipartFile originalImage) throws IOException {
         File resizeFile = new File("resized_" + originalImage.getOriginalFilename());
         Thumbnails.of(originalImage.getInputStream())
-                  .size(400, 400)
-                  .toFile(resizeFile);
+                .size(400, 400)
+                .toFile(resizeFile);
         return resizeFile;
     }
 
@@ -136,8 +142,9 @@ public class MyPageService {
                     }
                 }
             }
+
             List<ReviewImageEntity> reviewImageEntityList = reviewImageRepository.findReviewImageEntityByReviewEntity_ReviewId(reviewId)
-                                                                                 .get();
+                    .get();
             findReview.setReviewImageEntityList(reviewImageEntityList);
             Long delSaveReviewId = reviewRepository.save(findReview).getReviewId();
             if (updateReviewDto.getImageDtoList().size() == 3) {
@@ -171,13 +178,13 @@ public class MyPageService {
 
                         //이미지 저장
                         reviewImageRepository.save(ReviewImageEntity.builder()
-                                                                    .reviewOriginName(fileName)
-                                                                    .reviewStoredName(storedName)
-                                                                    .reviewResizeStoredName(resizeName)
-                                                                    .reviewOriginUrl(accessUrl)
-                                                                    .reviewResizeUrl(resizeUrl)
-                                                                    .reviewEntity(updateReview)
-                                                                    .build());
+                                .reviewOriginName(fileName)
+                                .reviewStoredName(storedName)
+                                .reviewResizeStoredName(resizeName)
+                                .reviewOriginUrl(accessUrl)
+                                .reviewResizeUrl(resizeUrl)
+                                .reviewEntity(updateReview)
+                                .build());
 
                         if (resizedImageFile != null && resizedImageFile.exists()) {
                             if (resizedImageFile.delete()) {
@@ -197,49 +204,51 @@ public class MyPageService {
                 updateReviewEntity.setReviewContent(updateReviewDto.getReviewContent());
                 Long saveReviewId = reviewRepository.save(updateReviewEntity).getReviewId();
                 ReviewEntity updateReview = reviewRepository.findById(saveReviewId).get();
-                for (MultipartFile multipartFile : imageFile) {
+                if(imageFile.size()>1) {
+                    for (MultipartFile multipartFile : imageFile) {
 
-                    String fileName = multipartFile.getOriginalFilename(); //원본 파일
+                        String fileName = multipartFile.getOriginalFilename(); //원본 파일
 
-                    try {
-                        //이미지 객체 생성
-                        ObjectMetadata objectMetadata = new ObjectMetadata();
-                        objectMetadata.setContentType(multipartFile.getContentType());
-                        objectMetadata.setContentLength(multipartFile.getSize());
+                        try {
+                            //이미지 객체 생성
+                            ObjectMetadata objectMetadata = new ObjectMetadata();
+                            objectMetadata.setContentType(multipartFile.getContentType());
+                            objectMetadata.setContentLength(multipartFile.getSize());
 
-                        //원본 파일 저장
-                        String storedName = createFileName(fileName);
-                        amazonS3Client.putObject(new PutObjectRequest(bucketName, storedName, multipartFile.getInputStream(), objectMetadata));
-                        String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
-                        System.out.println("Original Image URL:" + accessUrl);
+                            //원본 파일 저장
+                            String storedName = createFileName(fileName);
+                            amazonS3Client.putObject(new PutObjectRequest(bucketName, storedName, multipartFile.getInputStream(), objectMetadata));
+                            String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
+                            System.out.println("Original Image URL:" + accessUrl);
 
-                        //리사이징 파일 저장
-                        String resizeName = "resized_" + storedName;
-                        File resizedImageFile = resizeImage(multipartFile);
-                        amazonS3Client.putObject(bucketName, resizeName, resizedImageFile);
-                        String resizeUrl = amazonS3Client.getUrl(bucketName, resizeName).toString();
-                        ReviewImageEntity reviewImageEntity = ReviewImageEntity.builder()
-                                                                               .reviewOriginName(fileName)
-                                                                               .reviewStoredName(storedName)
-                                                                               .reviewResizeStoredName(resizeName)
-                                                                               .reviewOriginUrl(accessUrl)
-                                                                               .reviewResizeUrl(resizeUrl)
-                                                                               .reviewEntity(updateReview)
-                                                                               .build();
-                        //이미지 저장
-                        reviewImageRepository.save(reviewImageEntity);
+                            //리사이징 파일 저장
+                            String resizeName = "resized_" + storedName;
+                            File resizedImageFile = resizeImage(multipartFile);
+                            amazonS3Client.putObject(bucketName, resizeName, resizedImageFile);
+                            String resizeUrl = amazonS3Client.getUrl(bucketName, resizeName).toString();
+                            ReviewImageEntity reviewImageEntity = ReviewImageEntity.builder()
+                                    .reviewOriginName(fileName)
+                                    .reviewStoredName(storedName)
+                                    .reviewResizeStoredName(resizeName)
+                                    .reviewOriginUrl(accessUrl)
+                                    .reviewResizeUrl(resizeUrl)
+                                    .reviewEntity(updateReview)
+                                    .build();
+                            //이미지 저장
+                            reviewImageRepository.save(reviewImageEntity);
 
-                        if (resizedImageFile != null && resizedImageFile.exists()) {
-                            if (resizedImageFile.delete()) {
-                                log.info("이미지 삭제됨");
+                            if (resizedImageFile != null && resizedImageFile.exists()) {
+                                if (resizedImageFile.delete()) {
+                                    log.info("이미지 삭제됨");
+                                } else {
+                                    log.info("이미지 삭제");
+                                }
                             } else {
-                                log.info("이미지 삭제");
+                                log.info("이미지파일 없음");
                             }
-                        } else {
-                            log.info("이미지파일 없음");
+                        } catch (IOException e) {
+                            throw new RuntimeException("이미지 업로드에 실패했습니다.");
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException("이미지 업로드에 실패했습니다.");
                     }
                 }
             } else {
@@ -249,7 +258,6 @@ public class MyPageService {
             }
             return true;
         } else {
-
             return false;
         }
     }
@@ -261,24 +269,24 @@ public class MyPageService {
         for (ReviewImageEntity reviewImageEntity : reviewImageRepository.findReviewImageEntityByReviewEntity_ReviewId(reviewId).get()) {
             ReviewImageDto reviewImageDto =
                     ReviewImageDto.builder()
-                                  .reviewImageId(reviewImageEntity.getReviewImageId())
-                                  .reviewOriginName(reviewImageEntity.getReviewOriginName())
-                                  .reviewOriginUrl(reviewImageEntity.getReviewOriginUrl())
-                                  .reviewResizeUrl(reviewImageEntity.getReviewResizeUrl())
-                                  .reviewStoredName(reviewImageEntity.getReviewStoredName())
-                                  .build();
+                            .reviewImageId(reviewImageEntity.getReviewImageId())
+                            .reviewOriginName(reviewImageEntity.getReviewOriginName())
+                            .reviewOriginUrl(reviewImageEntity.getReviewOriginUrl())
+                            .reviewResizeUrl(reviewImageEntity.getReviewResizeUrl())
+                            .reviewStoredName(reviewImageEntity.getReviewStoredName())
+                            .build();
             reviewImageDtoList.add(reviewImageDto);
         }
 
         MyReviewDto myReviewDto =
                 MyReviewDto.builder()
-                           .restaurantId(responseEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
-                           .restaurantName(responseEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
-                           .reviewContent(responseEntity.getReviewContent()) //리뷰내용
-                           .reviewStarRating(responseEntity.getReviewStarRating()) //리뷰별점
-                           .reviewImageDto(reviewImageDtoList)
-                           .reviewAt(responseEntity.getReviewAt()) // 리뷰작성시간
-                           .build();
+                        .restaurantId(responseEntity.getRestaurantEntity().getRestaurantId()) // 레스토랑ID
+                        .restaurantName(responseEntity.getRestaurantEntity().getRestaurantName()) //레스토랑이름
+                        .reviewContent(responseEntity.getReviewContent()) //리뷰내용
+                        .reviewStarRating(responseEntity.getReviewStarRating()) //리뷰별점
+                        .reviewImageDto(reviewImageDtoList)
+                        .reviewAt(responseEntity.getReviewAt()) // 리뷰작성시간
+                        .build();
         return ResponseEntity.status(200).body(myReviewDto);
 
     }
@@ -290,19 +298,19 @@ public class MyPageService {
         List<MyPlaceDto> myPlaceDtoList = new ArrayList<>();
         for (LikeCountEntity likeCountEntity : myPlace) {
             MyPlaceDto myPlaceDto = MyPlaceDto.builder()
-                                              .restaurantId(likeCountEntity.getRestaurantEntity()
-                                                                                                .getRestaurantId())
-                                              .restaurantName(likeCountEntity.getRestaurantEntity()
-                                                                                                  .getRestaurantName())
-                                              .restaurantAddress(likeCountEntity.getRestaurantEntity()
-                                                                                                     .getRestaurantAddress())
-                                              .restaurantWebSite(likeCountEntity.getRestaurantEntity()
-                                                                                                     .getRestaurantWebSite())
-                                              .resizeImgUrl(likeCountEntity.getRestaurantEntity()
-                                                                                                .getRestaurantImageEntity()
-                                                                                                .get(0)
-                                                                                                .getRestaurantResizeUrl())
-                                              .build();
+                    .restaurantId(likeCountEntity.getRestaurantEntity()
+                            .getRestaurantId())
+                    .restaurantName(likeCountEntity.getRestaurantEntity()
+                            .getRestaurantName())
+                    .restaurantAddress(likeCountEntity.getRestaurantEntity()
+                            .getRestaurantAddress())
+                    .restaurantWebSite(likeCountEntity.getRestaurantEntity()
+                            .getRestaurantWebSite())
+                    .resizeImgUrl(likeCountEntity.getRestaurantEntity()
+                            .getRestaurantImageEntity()
+                            .get(0)
+                            .getRestaurantResizeUrl())
+                    .build();
             myPlaceDtoList.add(myPlaceDto);
         }
         return ResponseEntity.status(200).body(myPlaceDtoList);
@@ -312,7 +320,7 @@ public class MyPageService {
         Long memberId = Long.valueOf(userId);
         Map<String, Object> likeCountMap = new HashMap<>();
         // 좋아요가 있는지 체크
-        Optional<LikeCountEntity> likeCountEntityOptional = likeCountRepository.findByMemberEntityAndRestaurantEntity(memberId,restaurantId);
+        Optional<LikeCountEntity> likeCountEntityOptional = likeCountRepository.findByMemberEntityAndRestaurantEntity(memberId, restaurantId);
 
         // 장소 저장이 되었는지 체크 후 장소 저장 카운트 리턴
         int likeCount;
@@ -334,12 +342,11 @@ public class MyPageService {
         }
         likeCount = likeCountRepository.countByRestaurantEntity_RestaurantId(restaurantId);
 
-        likeCountMap.put("likeButtonClicked",likeButton);
+        likeCountMap.put("likeButtonClicked", likeButton);
         likeCountMap.put("likeCount", likeCount);
 
         return ResponseEntity.status(200).body(likeCountMap);
     }
-
 
 
 }
