@@ -64,6 +64,8 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://localhost:8080");
         configuration.addAllowedOrigin("https://localhost:8080");
         configuration.addAllowedOrigin("https://localhost:3000");
+        configuration.addAllowedOrigin("http://sunflowerbucket.s3-website.ap-northeast-2.amazonaws.com/");
+        configuration.addAllowedOrigin("https://d2sazj0o44qfc0.cloudfront.net/");
         configuration.addAllowedMethod("GET");
         configuration.addAllowedMethod("POST");
         configuration.addAllowedMethod("PUT");
